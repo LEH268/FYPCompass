@@ -1,49 +1,32 @@
 export const studentDashboard = {
-
-    projectTitle:
-    "AI Based Smart Campus Assistant",
-
-    supervisor:
-    "Dr. Ahmad Rahman",
-
-    progress:65,
-
-
-    milestones:[
-
-        {
-            name:"Project Proposal",
-            status:"Completed",
-            date:"20 June 2026"
-        },
-
-        {
-            name:"Literature Review",
-            status:"Completed",
-            date:"15 July 2026"
-        },
-
-        {
-            name:"System Design",
-            status:"In Progress",
-            date:"30 July 2026"
-        },
-
-        {
-            name:"Final Report",
-            status:"Pending",
-            date:"20 August 2026"
-        }
-
+    progress: 45,
+    projectTitle: "FYPCompass - Final Year Project Supervision System",
+    supervisor: "Dr. Wan Siti Nur Aiza Wan Othman",
+    notifications: [
+        "Your Project Proposal has been approved.",
+        "Reminder: System Design Specification due next week.",
+        "Supervisor left a new comment on your timeline."
     ],
-
-
-    notifications:[
-
-        "Supervisor provided new feedback",
-        "System Design milestone due soon",
-        "Consultation scheduled tomorrow"
-
+    milestones: [
+        {
+            name: "Project Proposal",
+            date: "Oct 15, 2026",
+            status: "Completed"
+        },
+        {
+            name: "System Requirements Document",
+            date: "Nov 01, 2026",
+            status: "Completed"
+        },
+        {
+            name: "System Design Specification",
+            date: "Nov 07, 2026",
+            status: "In Progress"
+        },
+        {
+            name: "Final Presentation",
+            date: "Dec 15, 2026",
+            status: "Pending"
+        }
     ]
-
-}
+};
