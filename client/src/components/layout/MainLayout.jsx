@@ -1,20 +1,27 @@
 import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
 import { Outlet } from "react-router-dom";
 
-const Layout = ({role}) => {
-  return (
-    <div className="flex min-h-screen bg-gray-100">
-      
-      {/* Sidebar */}
-      <Sidebar role={role}/>
+export default function Layout({ role }) {
+    return (
+        <div className="flex h-screen bg-gray-100 overflow-hidden">
+            
+            {/* Left Sidebar */}
+            <Sidebar role={role} />
 
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-        <Outlet/>
-      </main>
+            {/* Right Side (Navbar + Main Content area) */}
+            <div className="flex-1 flex flex-col min-w-0">
+                
+                {/* Top Navbar */}
+                <Navbar role={role} />
 
-    </div>
-  )
+                {/* Main Page Content (scrollable) */}
+                <main className="flex-1 p-8 overflow-y-auto">
+                    <Outlet />
+                </main>
+
+            </div>
+            
+        </div>
+    );
 }
-
-export default Layout;
