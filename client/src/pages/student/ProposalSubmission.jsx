@@ -1,80 +1,100 @@
-import { useState } from "react";
-import FileUpload from "../../components/FileUpload";
+import { UploadCloud, File, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function ProposalSubmission() {
-    const [isSubmitted, setIsSubmitted] = useState(false);
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
+      
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-slate-800">Project Proposal Submission</h1>
+        <p className="text-slate-500 mt-1">Submit your finalized proposal document for supervisor review.</p>
+      </div>
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setIsSubmitted(true);
-        // In a real app, you would send data to the backend here
-    };
+      {/* Info Banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start">
+        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+        <div>
+          <h4 className="text-sm font-bold text-blue-900">Submission Guidelines</h4>
+          <p className="text-sm text-blue-700 mt-1">
+            Please ensure your document follows the university's IEEE format guidelines. 
+            Only <span className="font-semibold">.PDF</span> files under 10MB are accepted. Maximum 2 submissions allowed before the deadline.
+          </p>
+        </div>
+      </div>
 
-    return (
-        <div className="max-w-3xl mx-auto space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-800">Proposal Submission</h1>
-                <p className="text-gray-500">Submit your initial FYP proposal for coordinator and supervisor approval.</p>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="p-6 md:p-8">
+          <form className="space-y-6">
+            
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Project Title</label>
+                <input 
+                  type="text" 
+                  defaultValue="Automated Healthcare Diagnosis Using Deep Learning"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-600 outline-none text-sm text-slate-800 font-medium"
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Supervisor</label>
+                <input 
+                  type="text" 
+                  defaultValue="Dr. Alan Turing"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-600 outline-none text-sm text-slate-800 font-medium cursor-not-allowed"
+                  disabled
+                />
+              </div>
             </div>
 
-            {isSubmitted ? (
-                <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-6 text-center">
-                    <h2 className="text-2xl font-bold mb-2">Proposal Submitted Successfully!</h2>
-                    <p>Your proposal is currently pending review from the FYP Coordinator.</p>
-                    <button 
-                        onClick={() => setIsSubmitted(false)}
-                        className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-                    >
-                        Submit Another Revision
-                    </button>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Additional Remarks (Optional)</label>
+              <textarea 
+                rows="3" 
+                placeholder="Any notes for your supervisor regarding this version..."
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none text-sm transition-all"
+              ></textarea>
+            </div>
+
+            {/* Drag & Drop Upload Zone */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Upload File</label>
+              <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-indigo-400 transition-colors cursor-pointer group">
+                <div className="w-12 h-12 bg-white rounded-full shadow-sm border border-slate-200 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <UploadCloud className="w-6 h-6 text-indigo-500" />
                 </div>
-            ) : (
-                <div className="bg-white rounded-xl shadow-sm border p-6 or p-8">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
-                            <input 
-                                type="text" 
-                                required
-                                placeholder="e.g., FYPCompass Web System"
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                        </div>
+                <p className="text-sm font-bold text-slate-700 mb-1">Click to upload or drag and drop</p>
+                <p className="text-xs text-slate-500">PDF, DOCX (Max 10MB)</p>
+              </div>
+            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Supervisor (Optional)</label>
-                            <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="">Select a supervisor...</option>
-                                <option value="1">Dr. Wan Siti Nur Aiza</option>
-                                <option value="2">Dr. Alan Turing</option>
-                                <option value="3">Prof. Grace Hopper</option>
-                            </select>
-                        </div>
+            {/* Simulated Attached File (To show what it looks like after upload) */}
+            <div className="flex items-center p-3 bg-white border border-emerald-200 rounded-lg shadow-sm">
+              <div className="w-10 h-10 bg-rose-50 rounded flex items-center justify-center mr-3">
+                <File className="w-5 h-5 text-rose-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-slate-800">Proposal_Final_Draft_v2.pdf</p>
+                <p className="text-xs text-slate-500">2.4 MB</p>
+              </div>
+              <CheckCircle2 className="w-5 h-5 text-emerald-500 mr-2" />
+            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Project Description / Abstract</label>
-                            <textarea 
-                                required
-                                rows="5"
-                                placeholder="Briefly describe the problem statement, objectives, and proposed methodology..."
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            ></textarea>
-                        </div>
-
-                        <FileUpload label="Attach Proposal Document (PDF)" />
-
-                        <div className="pt-4 border-t flex justify-end">
-                            <button 
-                                type="submit"
-                                className="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition font-semibold"
-                            >
-                                Submit Proposal
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            )}
+          </form>
         </div>
-    );
+
+        {/* Form Actions Footer */}
+        <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-end space-x-3">
+          <button className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors flex items-center">
+            Submit Proposal
+          </button>
+        </div>
+      </div>
+
+    </div>
+  );
 }

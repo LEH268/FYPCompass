@@ -50,7 +50,7 @@ export default function Login() {
           <form onSubmit={handleLogin} className="space-y-5">
             {/* Quick Demo Role Selector */}
             <div className="flex bg-slate-100 p-1 rounded-lg mb-6">
-              {['student', 'supervisor', 'coordinator'].map((r) => (
+              {['student', 'supervisor', 'coordinator', 'examiner'].map((r) => (
                 <button
                   key={r}
                   type="button"
