@@ -1,73 +1,71 @@
-import {
-    LayoutDashboard,
-    FileText,
-    Clock,
-    MessageSquare,
-    CalendarDays,
-    Bell,
-    LogOut,
-    Users
+import { NavLink } from "react-router-dom";
+import { 
+  Compass, LayoutDashboard, Flag, FileUp, Users, MessageSquare, Settings, LogOut 
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ role }) {
-    const navigate = useNavigate();
+  const getNavLinks = () => {
+    switch (role) {
+      case "student":
+        return [
+          { name: "Dashboard", path: "/student", icon: LayoutDashboard },
+          { name: "Milestones", path: "/student/milestones", icon: Flag },
+          { name: "Submissions", path: "/student/proposal", icon: FileUp },
+          { name: "Consultations", path: "/student/consultations", icon: Users },
+        ];
+      case "supervisor":
+        return [
+          { name: "Dashboard", path: "/supervisor", icon: LayoutDashboard },
+          { name: "My Students", path: "/supervisor/students", icon: Users },
+          { name: "Feedback", path: "/supervisor/feedback", icon: MessageSquare },
+        ];
+      default:
+        return [{ name: "Dashboard", path: "/coordinator", icon: LayoutDashboard }];
+    }
+  };
 
-    const menu = {
-        Student: [
-            { name: "Dashboard", icon: LayoutDashboard, path: "/student/dashboard" },
-            { name: "Proposal Submission", icon: FileText, path: "/student/proposal" },
-            { name: "Milestones", icon: Clock, path: "/student/milestones" },
-            { name: "Feedback", icon: MessageSquare, path: "/student/feedback" },
-            { name: "Consultation Records", icon: CalendarDays, path: "/student/consultations" },
-            { name: "Notifications", icon: Bell, path: "/student/notifications" }
-        ],
-        Supervisor: [
-            { name: "Dashboard", icon: LayoutDashboard, path: "/supervisor/dashboard" },
-            { name: "Student Progress", icon: Clock, path: "/supervisor/progress" },
-            { name: "Feedback Management", icon: MessageSquare, path: "/supervisor/feedback" },
-            { name: "Consultations", icon: CalendarDays, path: "/supervisor/consultations" }
-        ],
-        Coordinator: [
-            { name: "Dashboard", icon: LayoutDashboard, path: "/coordinator/dashboard" },
-            { name: "Assign Supervisors", icon: Users, path: "/coordinator/assign" },
-            { name: "Reports", icon: FileText, path: "#" }
-        ],
-        Examiner: [
-            { name: "Dashboard", icon: LayoutDashboard, path: "/examiner/dashboard" },
-            // Project Evaluation is accessed by clicking a specific project, so it doesn't need a sidebar link
-        ]
-    };
+  const links = getNavLinks();
 
-    return (
-        <aside className="w-64 h-screen bg-slate-900 text-white flex flex-col p-5 sticky top-0">
-            <h1 className="text-2xl font-bold mb-8 text-center text-blue-400">
-                FYPCompass
-            </h1>
+  return (
+    <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0">
+      <div className="h-16 flex items-center px-6 border-b border-slate-100">
+        <Compass className="h-7 w-7 text-indigo-600 mr-2" />
+        <span className="text-xl font-bold text-slate-800">FYPCompass</span>
+      </div>
 
-            <nav className="flex-1 overflow-y-auto">
-                {menu[role]?.map((item, index) => {
-                    const Icon = item.icon;
-                    return (
-                        <button
-                            key={index}
-                            onClick={() => navigate(item.path)}
-                            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-700 mb-2 transition"
-                        >
-                            <Icon size={20} />
-                            <span>{item.name}</span>
-                        </button>
-                    );
-                })}
-            </nav>
-
-            <button
-                onClick={() => navigate("/")}
-                className="flex items-center gap-3 px-4 py-3 mt-4 hover:bg-red-500 rounded-lg transition"
+      <div className="flex-1 overflow-y-auto py-6 px-4">
+        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-2">
+          Menu
+        </div>
+        <nav className="space-y-1">
+          {links.map((link) => (
+            <NavLink
+              key={link.name}
+              to={link.path}
+              end={link.path === `/${role}`}
+              className={({ isActive }) =>
+                `flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-indigo-50 text-indigo-600"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                }`
+              }
             >
-                <LogOut size={20} />
-                Logout
-            </button>
-        </aside>
-    );
+              <link.icon className="h-5 w-5 mr-3 flex-shrink-0" />
+              {link.name}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      <div className="p-4 border-t border-slate-100 space-y-1">
+        <button className="flex w-full items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
+          <Settings className="h-5 w-5 mr-3" /> Settings
+        </button>
+        <NavLink to="/login" className="flex w-full items-center px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+          <LogOut className="h-5 w-5 mr-3" /> Logout
+        </NavLink>
+      </div>
+    </aside>
+  );
 }

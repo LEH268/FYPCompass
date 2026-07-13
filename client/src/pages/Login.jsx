@@ -1,114 +1,118 @@
 import { useState } from "react";
-import { Eye, EyeOff, GraduationCap } from "lucide-react";
-// 1. Import useNavigate
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
+import { Compass, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  
-  // 2. Initialize the navigate function
-  const navigate = useNavigate(); 
+  const [role, setRole] = useState("student");
+  const navigate = useNavigate();
 
-  // 3. Create a function to handle the login
   const handleLogin = (e) => {
-    e.preventDefault(); // This stops the page from refreshing
-    
-    // For now, since this is just a UI prototype, we will 
-    // directly send the user to the student dashboard.
-    // Later, you would add your backend authentication logic here.
-    navigate("/student/dashboard"); 
+    e.preventDefault();
+    // Simulate login redirect based on role
+    navigate(`/${role}`);
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
-
-      {/* Left Branding Section */}
-      <div className="hidden md:flex w-1/2 bg-blue-900 text-white flex-col justify-center px-16">
-        <div className="flex items-center gap-3 mb-6">
-          <GraduationCap size={50}/>
-          <h1 className="text-4xl font-bold">
-            FYPCompass
-          </h1>
+    <div className="flex min-h-screen bg-slate-50">
+      {/* Left Panel - Branding (Hidden on Mobile) */}
+      <div className="hidden lg:flex w-1/2 bg-indigo-900 relative flex-col justify-between p-12 text-white overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl"></div>
+        
+        <div className="relative z-10 flex items-center space-x-3">
+          <Compass className="h-10 w-10 text-blue-400" />
+          <span className="text-3xl font-bold tracking-tight">FYPCompass</span>
         </div>
-        <p className="text-xl leading-relaxed">
-          A centralized Final Year Project supervision and milestone tracking system.
-        </p>
-        <p className="mt-6 text-blue-200">
-          Track progress • Submit milestones • Receive feedback • Manage supervision
-        </p>
+        
+        <div className="relative z-10 max-w-lg mt-20">
+          <h1 className="text-4xl font-bold leading-tight mb-6">Streamline Your Final Year Project Journey.</h1>
+          <p className="text-indigo-200 text-lg leading-relaxed">
+            The all-in-one platform for Sunway University students, supervisors, and coordinators to manage milestones, submissions, and feedback.
+          </p>
+        </div>
+        <div className="relative z-10 text-sm text-indigo-400">
+          &copy; 2026 Sunway University. Faculty of Computing.
+        </div>
       </div>
 
-      {/* Login Form */}
-      <div className="flex flex-1 items-center justify-center">
-        <div className="bg-white shadow-xl rounded-xl p-10 w-[400px]">
-          <h2 className="text-3xl font-bold text-gray-800">
-            Welcome Back
-          </h2>
-          <p className="text-gray-500 mt-2 mb-8">
-            Login to your FYPCompass account
-          </p>
+      {/* Right Panel - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+          <div className="flex items-center space-x-2 mb-8 lg:hidden">
+            <Compass className="h-8 w-8 text-indigo-600" />
+            <span className="text-2xl font-bold text-slate-800">FYPCompass</span>
+          </div>
 
-          {/* 4. Attach the handleLogin function to the form's onSubmit event */}
-          <form className="space-y-5" onSubmit={handleLogin}>
-            
-            {/* Email */}
-            <div>
-              <label className="text-sm font-medium">
-                Email
-              </label>
-              <input
-                type="email"
-                placeholder="example@student.com"
-                className="w-full mt-2 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+          <h2 className="text-3xl font-bold text-slate-800 mb-2">Welcome back</h2>
+          <p className="text-slate-500 mb-8">Please enter your institutional credentials.</p>
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Quick Demo Role Selector */}
+            <div className="flex bg-slate-100 p-1 rounded-lg mb-6">
+              {['student', 'supervisor', 'coordinator'].map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className={`flex-1 capitalize text-xs font-semibold py-2 rounded-md transition-all ${
+                    role === r ? 'bg-white shadow text-indigo-600' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
             </div>
 
-            {/* Password */}
             <div>
-              <label className="text-sm font-medium">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Student/Staff ID</label>
               <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="********"
-                  className="w-full mt-2 px-4 py-3 border rounded-lg pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-slate-400" />
+                </div>
+                <input 
+                  type="text" 
+                  required 
+                  placeholder="e.g. 25008442"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
                 />
-                <button
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="block text-sm font-medium text-slate-700">Password</label>
+                <a href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-slate-400" />
+                </div>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  required 
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
+                />
+                <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-5 text-gray-500"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
                 >
-                  {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Role */}
-            <div>
-              <label className="text-sm font-medium">
-                Login As
-              </label>
-              <select
-                className="w-full mt-2 px-4 py-3 border rounded-lg"
-              >
-                <option>Student</option>
-                <option>Supervisor</option>
-                <option>FYP Coordinator</option>
-                <option>Examiner</option>
-              </select>
-            </div>
-
-            <button
-              // Ensure this is a submit button (which is the default, but good practice to declare)
+            <button 
               type="submit" 
-              className="w-full bg-blue-900 text-white py-3 rounded-lg hover:bg-blue-800 transition font-semibold"
+              className="w-full flex justify-center items-center py-2.5 px-4 mt-4 text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors shadow-md"
             >
-              Login
+              Sign In <ArrowRight className="ml-2 h-4 w-4" />
             </button>
           </form>
         </div>
       </div>
     </div>
-  )
+  );
 }

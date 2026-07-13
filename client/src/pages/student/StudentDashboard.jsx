@@ -1,337 +1,123 @@
-import DashboardCard from "../../components/DashboardCard";
-import ProgressBar from "../../components/ProgressBar";
-
-import {
-    studentDashboard
-}
-from "../../data/studentData";
-
-
-export default function StudentDashboard(){
-
-
-return (
-
-<div className="space-y-6">
-
-
-{/* Header */}
-
-<div>
-
-<h1 className="
-text-3xl
-font-bold
-text-gray-800
-">
-Student Dashboard
-</h1>
-
-
-<p className="text-gray-500">
-Welcome back, monitor your FYP progress here.
-</p>
-
-
-</div>
-
-
-
-{/* Cards */}
-
-<div className="
-grid
-grid-cols-1
-md:grid-cols-3
-gap-6
-">
-
-
-<DashboardCard
-
-title="Project Progress"
-
-value={`${studentDashboard.progress}%`}
-
-description="Completed"
-
-icon="📊"
-
-/>
-
-
-
-<DashboardCard
-
-title="Milestones"
-
-value="4"
-
-description="Tracked stages"
-
-icon="📌"
-
-/>
-
-
-
-<DashboardCard
-
-title="Notifications"
-
-value="3"
-
-description="New updates"
-
-icon="🔔"
-
-/>
-
-
-
-</div>
-
-
-
-
-
-{/* Main Content */}
-
-<div className="
-grid
-grid-cols-1
-lg:grid-cols-3
-gap-6
-">
-
-
-
-{/* Progress */}
-
-<div className="
-bg-white
-rounded-xl
-shadow-sm
-border
-p-6
-lg:col-span-2
-">
-
-
-<h2 className="
-text-xl
-font-semibold
-mb-5
-">
-FYP Progress
-</h2>
-
-
-<ProgressBar
-
-progress={
-studentDashboard.progress
-}
-
-/>
-
-
-<div className="mt-6">
-
-<p className="font-semibold">
-Project:
-</p>
-
-<p className="text-gray-600">
-{studentDashboard.projectTitle}
-</p>
-
-
-<p className="font-semibold mt-3">
-Supervisor:
-</p>
-
-
-<p className="text-gray-600">
-{studentDashboard.supervisor}
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-{/* Notifications */}
-
-<div className="
-bg-white
-rounded-xl
-shadow-sm
-border
-p-6
-">
-
-
-<h2 className="
-text-xl
-font-semibold
-mb-4
-">
-Notifications
-</h2>
-
-
-
-<ul className="space-y-3">
-
-
-{
-studentDashboard.notifications.map(
-(item,index)=>(
-
-<li
-key={index}
-className="
-bg-gray-50
-p-3
-rounded-lg
-text-sm
-"
->
-
-{item}
-
-</li>
-
-)
-
-)
-}
-
-
-
-</ul>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-{/* Milestones */}
-
-<div className="
-bg-white
-rounded-xl
-shadow-sm
-border
-p-6
-">
-
-
-<h2 className="
-text-xl
-font-semibold
-mb-5
-">
-Upcoming Milestones
-</h2>
-
-
-
-<div className="
-space-y-4
-">
-
-
-{
-studentDashboard.milestones.map(
-(m,index)=>(
-
-
-<div
-key={index}
-className="
-flex
-justify-between
-items-center
-border-b
-pb-3
-"
->
-
-
-<div>
-
-<p className="font-medium">
-{m.name}
-</p>
-
-<p className="text-sm text-gray-500">
-Due: {m.date}
-</p>
-
-</div>
-
-
-
-<span
-className={`
-px-3
-py-1
-rounded-full
-text-sm
-
-${
-m.status==="Completed"
-?
-"bg-green-100 text-green-700"
-:
-m.status==="In Progress"
-?
-"bg-yellow-100 text-yellow-700"
-:
-"bg-gray-100 text-gray-600"
-
-}
-
-`}
->
-
-{m.status}
-
-</span>
-
-
-</div>
-
-
-)
-
-)
-
-}
-
-
-
-</div>
-
-
-</div>
-
-
-
-</div>
-
-)
-
+import { Clock, CheckCircle2, ChevronRight, FileText } from "lucide-react";
+
+export default function StudentDashboard() {
+  const fypData = {
+    title: "Automated Healthcare Diagnosis Using Deep Learning",
+    supervisor: "Dr. Alan Turing",
+    progress: 35,
+    status: "On Track"
+  };
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Welcome back, Earn Hui! 👋</h1>
+          <p className="text-slate-500 mt-1">Here is the latest progress on your Final Year Project.</p>
+        </div>
+        <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 shadow-sm transition-colors">
+          Book Consultation
+        </button>
+      </div>
+
+      {/* Main Overview Card */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 mb-3">
+              Active Project
+            </span>
+            <h2 className="text-xl font-bold text-slate-800 mb-1">{fypData.title}</h2>
+            <p className="text-sm text-slate-500">Supervised by {fypData.supervisor}</p>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex justify-between text-sm font-medium mb-2">
+            <span className="text-slate-700">Overall Progress</span>
+            <span className="text-indigo-600">{fypData.progress}%</span>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+            <div 
+              className="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000 ease-out" 
+              style={{ width: `${fypData.progress}%` }}
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Two Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Upcoming Milestones */}
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-bold text-slate-800">Upcoming Milestones</h3>
+            <a href="#" className="text-sm text-indigo-600 font-medium hover:underline">View All</a>
+          </div>
+          
+          <div className="space-y-4">
+            {/* Milestone 1 */}
+            <div className="flex p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-indigo-200 transition-colors group cursor-pointer">
+              <div className="h-12 w-12 rounded-lg bg-white border border-slate-200 flex flex-col items-center justify-center flex-shrink-0">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Aug</span>
+                <span className="text-lg font-black text-indigo-600 leading-none">15</span>
+              </div>
+              <div className="ml-4 flex-1">
+                <h4 className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Project Proposal</h4>
+                <p className="text-xs text-slate-500 mt-1">Submit the final draft including literature review.</p>
+              </div>
+              <div className="ml-4 flex flex-col items-end justify-center">
+                <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md">Pending</span>
+              </div>
+            </div>
+
+             {/* Milestone 2 */}
+             <div className="flex p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-indigo-200 transition-colors group cursor-pointer">
+              <div className="h-12 w-12 rounded-lg bg-white border border-slate-200 flex flex-col items-center justify-center flex-shrink-0">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Sep</span>
+                <span className="text-lg font-black text-slate-700 leading-none">02</span>
+              </div>
+              <div className="ml-4 flex-1">
+                <h4 className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">System Design (SRD)</h4>
+                <p className="text-xs text-slate-500 mt-1">Present your System Requirements Document.</p>
+              </div>
+              <div className="ml-4 flex flex-col items-end justify-center">
+                <span className="px-2.5 py-1 bg-slate-200 text-slate-600 text-xs font-bold rounded-md">Upcoming</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity / Action Needed */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Recent Feedback</h3>
+          
+          <div className="space-y-5">
+            <div className="relative pl-4 border-l-2 border-indigo-200">
+              <div className="absolute w-2 h-2 bg-indigo-600 rounded-full -left-[5px] top-1.5"></div>
+              <p className="text-xs font-medium text-slate-400 mb-1">12 Aug 2026</p>
+              <h4 className="text-sm font-semibold text-slate-800">Proposal Draft Review</h4>
+              <p className="text-sm text-slate-600 mt-1 bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
+                "Good starting point. Please narrow down the scope of the ML model."
+              </p>
+            </div>
+
+            <div className="relative pl-4 border-l-2 border-emerald-200">
+              <div className="absolute w-2 h-2 bg-emerald-500 rounded-full -left-[5px] top-1.5"></div>
+              <p className="text-xs font-medium text-slate-400 mb-1">05 July 2026</p>
+              <h4 className="text-sm font-semibold text-slate-800">Topic Approved</h4>
+              <p className="text-sm text-slate-600 mt-1">Your topic has been officially approved by the coordinator.</p>
+            </div>
+          </div>
+
+          <button className="w-full mt-6 py-2 flex items-center justify-center text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
+            View All Log <ChevronRight className="h-4 w-4 ml-1" />
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
 }
