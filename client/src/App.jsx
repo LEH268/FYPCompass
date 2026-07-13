@@ -15,6 +15,10 @@ import StudentProgress from "./pages/supervisor/StudentProgress";
 // Coordinator Pages
 import CoordinatorDashboard from "./pages/coordinator/CoordinatorDashboard";
 
+// Examiner Pages
+import ExaminerDashboard from "./pages/examiner/ExaminerDashboard";
+import ProjectEvaluation from "./pages/examiner/ProjectEvaluation";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -40,6 +44,12 @@ export default function App() {
         {/* Coordinator Routes */}
         <Route path="/coordinator" element={<MainLayout role="coordinator" />}>
           <Route index element={<CoordinatorDashboard />} />
+        </Route>
+
+        {/* Examiner Routes */}
+        <Route path="/examiner" element={<MainLayout role="examiner" />}>
+          <Route index element={<ExaminerDashboard />} />
+          <Route path="evaluations" element={<ProjectEvaluation />} />
         </Route>
 
         {/* Fallback 404 */}
