@@ -24,7 +24,6 @@ import ConsultationRecords from "./pages/student/ConsultationRecords";
 import SupervisorDashboard from "./pages/supervisor/SupervisorDashboard";
 import StudentProgress from "./pages/supervisor/StudentProgress";
 import FeedbackManagement from "./pages/supervisor/FeedbackManagement";
-// FIX: Added the missing SupervisorConsultation import
 import SupervisorConsultation from "./pages/supervisor/SupervisorConsultation"; 
 
 // =====================
@@ -74,7 +73,6 @@ function App() {
           <Route path="dashboard" element={<SupervisorDashboard />} />
           <Route path="progress" element={<StudentProgress />} />
           <Route path="feedback" element={<FeedbackManagement />} />
-          {/* FIX: Added the missing route to match the Sidebar link */}
           <Route path="consultations" element={<SupervisorConsultation />} />
         </Route>
 

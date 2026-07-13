@@ -1,5 +1,5 @@
 import { CalendarDays, BookOpen } from "lucide-react";
-import { consultationData } from "../../data/consultationData";
+import { consultationRecords } from "../../data/consultationData";
 
 export default function ConsultationRecords() {
     return (
@@ -10,7 +10,7 @@ export default function ConsultationRecords() {
             </div>
 
             <div className="grid gap-6">
-                {consultationData.map((session) => (
+                {consultationRecords.map((session) => (
                     <div key={session.id} className="bg-white rounded-xl shadow-sm border p-6">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="bg-indigo-100 p-3 rounded-lg">
