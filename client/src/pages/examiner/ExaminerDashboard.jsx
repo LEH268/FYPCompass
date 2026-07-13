@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { ClipboardCheck, CalendarClock, CheckCircle, FileText, MapPin, Video } from "lucide-react";
 
 export default function ExaminerDashboard() {
+  const navigate = useNavigate();
+
   const stats = [
     { title: "Pending Reports", value: "5", icon: FileText, color: "text-amber-600", bg: "bg-amber-50" },
     { title: "Upcoming Vivas", value: "3", icon: CalendarClock, color: "text-purple-600", bg: "bg-purple-50" },
@@ -23,7 +26,7 @@ export default function ExaminerDashboard() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center">
+          <div key={index} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center hover:shadow-md transition-shadow">
             <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mr-4`}>
               <stat.icon className="h-6 w-6" />
             </div>
@@ -41,6 +44,7 @@ export default function ExaminerDashboard() {
           <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/50">
             <h3 className="text-lg font-bold text-slate-800">Pending Evaluations</h3>
           </div>
+          
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -65,7 +69,10 @@ export default function ExaminerDashboard() {
                   </td>
                   <td className="p-4 text-rose-600 font-semibold text-xs">Tomorrow</td>
                   <td className="p-4 text-right pr-5">
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm">
+                    <button 
+                      onClick={() => navigate('/examiner/evaluations')}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm"
+                    >
                       Grade Now
                     </button>
                   </td>
@@ -83,7 +90,10 @@ export default function ExaminerDashboard() {
                   </td>
                   <td className="p-4 text-slate-600 text-xs font-medium">20 Aug 2026</td>
                   <td className="p-4 text-right pr-5">
-                    <button className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm">
+                    <button 
+                      onClick={() => navigate('/examiner/evaluations')}
+                      className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm"
+                    >
                       Start Review
                     </button>
                   </td>
@@ -99,7 +109,7 @@ export default function ExaminerDashboard() {
           
           <div className="space-y-4">
             {/* Schedule Item 1 */}
-            <div className="flex border border-purple-100 rounded-xl overflow-hidden shadow-sm">
+            <div className="flex border border-purple-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <div className="bg-purple-50 p-3 flex flex-col items-center justify-center border-r border-purple-100 min-w-[70px]">
                 <span className="text-[10px] font-bold text-purple-600 uppercase tracking-wider">Aug</span>
                 <span className="text-2xl font-black text-purple-700 leading-none mt-1">18</span>
@@ -117,7 +127,7 @@ export default function ExaminerDashboard() {
             </div>
 
             {/* Schedule Item 2 */}
-            <div className="flex border border-slate-200 rounded-xl overflow-hidden opacity-75 hover:opacity-100 transition-opacity">
+            <div className="flex border border-slate-200 rounded-xl overflow-hidden opacity-75 hover:opacity-100 hover:shadow-md transition-all cursor-pointer">
               <div className="bg-slate-50 p-3 flex flex-col items-center justify-center border-r border-slate-200 min-w-[70px]">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Aug</span>
                 <span className="text-2xl font-black text-slate-700 leading-none mt-1">20</span>

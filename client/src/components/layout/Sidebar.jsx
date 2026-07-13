@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { 
-  Compass, LayoutDashboard, Flag, FileUp, Users, MessageSquare, Settings, LogOut 
+  Compass, LayoutDashboard, Flag, FileUp, Users, MessageSquare, Settings, LogOut, ClipboardCheck 
 } from "lucide-react";
 
 export default function Sidebar({ role }) {
@@ -19,8 +19,16 @@ export default function Sidebar({ role }) {
           { name: "My Students", path: "/supervisor/students", icon: Users },
           { name: "Feedback", path: "/supervisor/feedback", icon: MessageSquare },
         ];
+      case "examiner":
+        return [
+          { name: "Dashboard", path: "/examiner", icon: LayoutDashboard },
+          { name: "Evaluations", path: "/examiner/evaluations", icon: ClipboardCheck },
+        ];
+      case "coordinator":
       default:
-        return [{ name: "Dashboard", path: "/coordinator", icon: LayoutDashboard }];
+        return [
+          { name: "Dashboard", path: "/coordinator", icon: LayoutDashboard }
+        ];
     }
   };
 

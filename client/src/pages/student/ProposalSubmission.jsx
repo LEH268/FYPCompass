@@ -1,100 +1,143 @@
-import { UploadCloud, File, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { UploadCloud, FileText, CheckCircle, AlertCircle, X, ArrowLeft } from "lucide-react";
 
 export default function ProposalSubmission() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
-      
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Project Proposal Submission</h1>
-        <p className="text-slate-500 mt-1">Submit your finalized proposal document for supervisor review.</p>
-      </div>
+  const navigate = useNavigate();
+  const [file, setFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-      {/* Info Banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start">
-        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
-        <div>
-          <h4 className="text-sm font-bold text-blue-900">Submission Guidelines</h4>
-          <p className="text-sm text-blue-700 mt-1">
-            Please ensure your document follows the university's IEEE format guidelines. 
-            Only <span className="font-semibold">.PDF</span> files under 10MB are accepted. Maximum 2 submissions allowed before the deadline.
-          </p>
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!file) return;
+    
+    setIsSubmitting(true);
+    // Simulate API call delay
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setSubmitted(true);
+    }, 1500);
+  };
+
+  if (submitted) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-in zoom-in duration-500">
+        <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+          <CheckCircle className="w-10 h-10" />
         </div>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">Submission Successful!</h2>
+        <p className="text-slate-500 mb-8 text-center max-w-md">
+          Your deliverable has been successfully uploaded and routed to your supervisor for review.
+        </p>
+        <button 
+          onClick={() => navigate('/student/milestones')}
+          className="px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md"
+        >
+          Return to Timeline
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-500">
+      <button 
+        onClick={() => navigate(-1)}
+        className="flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-4"
+      >
+        <ArrowLeft className="w-4 h-4 mr-1" /> Back
+      </button>
+
+      <div>
+        <h1 className="text-2xl font-bold text-slate-800">Submit Deliverable</h1>
+        <p className="text-slate-500 mt-1">Upload your document for the current milestone.</p>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-6 md:p-8">
-          <form className="space-y-6">
+        <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="inline-block px-2.5 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded mb-2">Current Milestone</span>
+              <h2 className="text-lg font-bold text-slate-800">System Design Specification (SDS)</h2>
+            </div>
+            <span className="text-sm font-semibold text-rose-600 bg-rose-50 px-3 py-1 rounded-lg border border-rose-100">
+              Due in 3 days
+            </span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Submission Comments (Optional)</label>
+            <textarea 
+              rows="3" 
+              placeholder="Add any notes for your supervisor here..."
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all resize-none text-sm"
+            ></textarea>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Upload Document</label>
             
-            {/* Form Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Project Title</label>
-                <input 
-                  type="text" 
-                  defaultValue="Automated Healthcare Diagnosis Using Deep Learning"
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-600 outline-none text-sm text-slate-800 font-medium"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Supervisor</label>
-                <input 
-                  type="text" 
-                  defaultValue="Dr. Alan Turing"
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-600 outline-none text-sm text-slate-800 font-medium cursor-not-allowed"
-                  disabled
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Additional Remarks (Optional)</label>
-              <textarea 
-                rows="3" 
-                placeholder="Any notes for your supervisor regarding this version..."
-                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none text-sm transition-all"
-              ></textarea>
-            </div>
-
-            {/* Drag & Drop Upload Zone */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Upload File</label>
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-indigo-400 transition-colors cursor-pointer group">
-                <div className="w-12 h-12 bg-white rounded-full shadow-sm border border-slate-200 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <UploadCloud className="w-6 h-6 text-indigo-500" />
+            {!file ? (
+              <div className="mt-1 flex justify-center px-6 pt-10 pb-12 border-2 border-slate-300 border-dashed rounded-xl hover:border-indigo-500 hover:bg-indigo-50/50 transition-colors group relative cursor-pointer">
+                <div className="space-y-2 text-center">
+                  <UploadCloud className="mx-auto h-12 w-12 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                  <div className="flex text-sm text-slate-600 justify-center">
+                    <label htmlFor="file-upload" className="relative cursor-pointer rounded-md font-bold text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                      <span>Upload a file</span>
+                      <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf,.doc,.docx,.zip" />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-slate-500">PDF, DOCX, or ZIP up to 50MB</p>
                 </div>
-                <p className="text-sm font-bold text-slate-700 mb-1">Click to upload or drag and drop</p>
-                <p className="text-xs text-slate-500">PDF, DOCX (Max 10MB)</p>
               </div>
+            ) : (
+              <div className="flex items-center justify-between p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-white rounded-lg shadow-sm">
+                    <FileText className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800">{file.name}</p>
+                    <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setFile(null)}
+                  className="p-1.5 hover:bg-indigo-100 rounded-lg transition-colors text-slate-500 hover:text-rose-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <div className="flex items-center text-xs text-slate-500">
+              <AlertCircle className="w-4 h-4 mr-1 text-amber-500" /> Ensure all components match the grading rubric.
             </div>
-
-            {/* Simulated Attached File (To show what it looks like after upload) */}
-            <div className="flex items-center p-3 bg-white border border-emerald-200 rounded-lg shadow-sm">
-              <div className="w-10 h-10 bg-rose-50 rounded flex items-center justify-center mr-3">
-                <File className="w-5 h-5 text-rose-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-slate-800">Proposal_Final_Draft_v2.pdf</p>
-                <p className="text-xs text-slate-500">2.4 MB</p>
-              </div>
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 mr-2" />
-            </div>
-
-          </form>
-        </div>
-
-        {/* Form Actions Footer */}
-        <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-end space-x-3">
-          <button className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
-            Cancel
-          </button>
-          <button className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors flex items-center">
-            Submit Proposal
-          </button>
-        </div>
+            <button
+              type="submit"
+              disabled={!file || isSubmitting}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all shadow-md ${
+                !file ? 'bg-slate-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg active:scale-95'
+              }`}
+            >
+              {isSubmitting ? 'Uploading...' : 'Submit Deliverable'}
+            </button>
+          </div>
+        </form>
       </div>
-
     </div>
   );
 }

@@ -1,20 +1,23 @@
+import { useNavigate } from "react-router-dom";
 import { Users, UserCog, AlertTriangle, ShieldAlert } from "lucide-react";
 
 export default function CoordinatorDashboard() {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Faculty Overview</h1>
           <p className="text-slate-500 mt-1">
-            Semester: <span className="font-semibold text-slate-700">Aug 2026</span> • Program: <span className="font-semibold text-slate-700">BSc Computer Science</span>
+            Semester: <span className="font-semibold text-slate-700">Aug 2026</span> | Program: <span className="font-semibold text-slate-700">BSc Computer Science</span>
           </p>
         </div>
         <div className="flex space-x-3">
           <button className="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-50 transition-colors">
             Export Report
           </button>
-          <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-emerald-700 transition-colors">
+          <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:bg-emerald-700 transition-colors active:scale-95">
             Broadcast Message
           </button>
         </div>
@@ -22,7 +25,7 @@ export default function CoordinatorDashboard() {
 
       {/* Global Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden hover:shadow-md transition-shadow">
           <div className="absolute right-0 top-0 w-16 h-16 bg-blue-50/50 rounded-bl-full flex justify-end p-3">
             <Users className="h-6 w-6 text-blue-500 opacity-50" />
           </div>
@@ -31,7 +34,7 @@ export default function CoordinatorDashboard() {
           <p className="text-xs text-emerald-600 mt-2 font-semibold">+12 from last sem</p>
         </div>
         
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden hover:shadow-md transition-shadow">
           <div className="absolute right-0 top-0 w-16 h-16 bg-indigo-50/50 rounded-bl-full flex justify-end p-3">
             <UserCog className="h-6 w-6 text-indigo-500 opacity-50" />
           </div>
@@ -40,13 +43,18 @@ export default function CoordinatorDashboard() {
           <p className="text-xs text-slate-500 mt-2 font-medium">Avg load: 5.5 / sup</p>
         </div>
 
-        <div className="bg-rose-50 p-5 rounded-2xl border border-rose-200 shadow-sm relative overflow-hidden">
+        <div className="bg-rose-50 p-5 rounded-2xl border border-rose-200 shadow-sm relative overflow-hidden hover:shadow-md transition-shadow">
           <div className="absolute right-0 top-0 w-16 h-16 bg-rose-100/50 rounded-bl-full flex justify-end p-3">
             <AlertTriangle className="h-6 w-6 text-rose-500 opacity-50" />
           </div>
           <p className="text-sm text-rose-700 font-medium mb-1">Unassigned Projects</p>
           <h3 className="text-3xl font-black text-rose-700">12</h3>
-          <p className="text-xs text-rose-600 mt-2 font-bold underline cursor-pointer">Action required</p>
+          <button 
+            onClick={() => navigate('/coordinator/assignment')} // Routing to Assignment
+            className="text-xs text-rose-600 mt-2 font-bold underline hover:text-rose-800 transition-colors"
+          >
+            Action required
+          </button>
         </div>
       </div>
 
@@ -119,7 +127,7 @@ export default function CoordinatorDashboard() {
           </div>
           
           <div className="space-y-4">
-            <div className="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl">
+            <div className="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl transition-all hover:shadow-sm">
               <div className="flex justify-between items-start">
                 <p className="text-sm font-bold text-slate-800">Missing Submissions</p>
               </div>
@@ -128,8 +136,8 @@ export default function CoordinatorDashboard() {
               </p>
               <button className="text-xs text-rose-700 font-bold mt-2 hover:underline">View List &rarr;</button>
             </div>
-
-            <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl">
+            
+            <div className="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl transition-all hover:shadow-sm">
               <p className="text-sm font-bold text-slate-800">Low Consultation Rate</p>
               <p className="text-xs font-medium text-slate-600 mt-1 leading-relaxed">
                 8 students have 0 logged consultations in the past 4 weeks.
