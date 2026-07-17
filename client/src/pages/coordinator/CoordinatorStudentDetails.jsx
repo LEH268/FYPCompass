@@ -22,8 +22,8 @@ export default function CoordinatorStudentDetails() {
           <div className="w-24 h-24 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4">
             <User className="w-10 h-10" />
           </div>
-          <h2 className="text-xl font-bold text-slate-800">Lee Earn Hui</h2>
-          <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mt-2">ID: {id || '25008442'}</span>
+          <h2 className="text-xl font-bold text-slate-800">Oliver Smith</h2>
+          <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-full mt-2">ID: {id || '25001001'}</span>
           <span className="mt-4 px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase">Status: On Track</span>
         </div>
         

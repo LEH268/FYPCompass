@@ -8,11 +8,10 @@ export default function CoordinatorDashboard() {
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
 
-  // Mock data for the alert modal to ensure routing works correctly
   const alertStudents = [
-    { id: "23011223", name: "John Doe" },
-    { id: "24127094", name: "Grace Wong" },
-    { id: "25008442", name: "Lee Earn Hui" }
+    { id: "25001001", name: "Oliver Smith" },
+    { id: "25001002", name: "Emma Johnson" },
+    { id: "25001006", name: "Ava Taylor" }
   ];
 
   return (
@@ -34,7 +33,6 @@ export default function CoordinatorDashboard() {
         </div>
       </div>
 
-      {/* Global Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <div onClick={() => navigate('/coordinator/students')} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group">
           <div className="absolute right-0 top-0 w-16 h-16 bg-blue-50/50 rounded-bl-full flex justify-end p-3 group-hover:scale-110 transition-transform">
@@ -65,7 +63,6 @@ export default function CoordinatorDashboard() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Cohort Progress Tracking */}
         <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/50">
             <h3 className="text-lg font-bold text-slate-800">Cohort Tracking</h3>
@@ -81,10 +78,10 @@ export default function CoordinatorDashboard() {
                 </tr>
               </thead>
               <tbody className="text-sm divide-y divide-slate-100">
-                <tr onClick={() => navigate('/coordinator/students/23011223')} className="hover:bg-slate-50/50 transition-colors cursor-pointer group">
+                <tr onClick={() => navigate('/coordinator/students/25001006')} className="hover:bg-slate-50/50 transition-colors cursor-pointer group">
                   <td className="p-4 pl-5">
-                    <div className="font-bold text-slate-800 group-hover:text-indigo-600">John Doe</div>
-                    <div className="text-xs text-slate-500">23011223</div>
+                    <div className="font-bold text-slate-800 group-hover:text-indigo-600">Ava Taylor</div>
+                    <div className="text-xs text-slate-500">25001006</div>
                   </td>
                   <td className="p-4 text-slate-600 font-medium">Topic Selection</td>
                   <td className="p-4">
@@ -98,10 +95,10 @@ export default function CoordinatorDashboard() {
                     </span>
                   </td>
                 </tr>
-                <tr onClick={() => navigate('/coordinator/students/25008442')} className="hover:bg-slate-50/50 transition-colors cursor-pointer group">
+                <tr onClick={() => navigate('/coordinator/students/25001001')} className="hover:bg-slate-50/50 transition-colors cursor-pointer group">
                   <td className="p-4 pl-5">
-                    <div className="font-bold text-slate-800 group-hover:text-indigo-600">Lee Earn Hui</div>
-                    <div className="text-xs text-slate-500">25008442</div>
+                    <div className="font-bold text-slate-800 group-hover:text-indigo-600">Oliver Smith</div>
+                    <div className="text-xs text-slate-500">25001001</div>
                   </td>
                   <td className="p-4 text-slate-600 font-medium">Proposal Review</td>
                   <td className="p-4">
@@ -120,7 +117,6 @@ export default function CoordinatorDashboard() {
           </div>
         </div>
 
-        {/* System Alerts */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center mb-5 pb-4 border-b border-slate-100">
             <ShieldAlert className="h-5 w-5 text-slate-700 mr-2" />
@@ -147,7 +143,6 @@ export default function CoordinatorDashboard() {
         </div>
       </div>
 
-      {/* MODALS */}
       {showExportModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center animate-in zoom-in-95 duration-200">

@@ -6,8 +6,8 @@ export default function CoordinatorSupervisorDetails() {
   const { id } = useParams();
 
   const supervisees = [
-    { id: "25008442", name: "Lee Earn Hui", topic: "AI Healthcare", status: "On Track" },
-    { id: "24127094", name: "Grace Wong", topic: "IoT Agriculture", status: "On Track" },
+    { id: "25001001", name: "Oliver Smith", topic: "AI Healthcare", status: "On Track" },
+    { id: "25001002", name: "Emma Johnson", topic: "IoT Agriculture", status: "On Track" },
   ];
 
   return (
@@ -45,7 +45,6 @@ export default function CoordinatorSupervisorDetails() {
         </div>
       </div>
 
-      {/* Assigned Students List */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center">
           <Users className="w-5 h-5 text-indigo-600 mr-2" />

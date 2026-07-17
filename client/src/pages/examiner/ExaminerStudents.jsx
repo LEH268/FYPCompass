@@ -3,9 +3,16 @@ import { Search, ChevronRight } from "lucide-react";
 
 export default function ExaminerStudents() {
   const navigate = useNavigate();
+
   const students = [
-    { id: "25008442", name: "Lee Earn Hui", topic: "AI Healthcare", type: "Final Report", status: "Pending" },
-    { id: "24127094", name: "Grace Wong", topic: "IoT Agriculture", type: "Viva Presentation", status: "Upcoming" },
+    { id: "25001001", name: "Oliver Smith", topic: "Healthcare AI Diagnosis", type: "Final Report", status: "Pending" },
+    { id: "25001002", name: "Emma Johnson", topic: "IoT Smart Agriculture", type: "Final Report", status: "Pending" },
+    { id: "25001003", name: "Lucas Brown", topic: "Blockchain Verification", type: "Final Report", status: "Pending" },
+    { id: "25001004", name: "Mia Davis", topic: "AR Campus Navigation", type: "Final Report", status: "Pending" },
+    { id: "25001005", name: "Ethan Wilson", topic: "ML Predictive Maintenance", type: "Final Report", status: "Pending" },
+    { id: "25001006", name: "Ava Taylor", topic: "Smart Traffic Management", type: "Viva Presentation", status: "Upcoming" },
+    { id: "25001007", name: "Noah Miller", topic: "Cybersecurity Analyzer", type: "Viva Presentation", status: "Upcoming" },
+    { id: "25001008", name: "Sophia Moore", topic: "Virtual Tour App", type: "Viva Presentation", status: "Upcoming" }
   ];
 
   return (

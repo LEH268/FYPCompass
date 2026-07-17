@@ -3,11 +3,11 @@ import { UserPlus, AlertCircle, Search, CheckCircle } from "lucide-react";
 
 export default function SupervisorAssignment() {
   const [assignmentSuccess, setAssignmentSuccess] = useState(false);
-  
+
   const [unassignedStudents, setUnassignedStudents] = useState([
-    { id: "25011922", name: "Tan Ah Meng", topic: "Blockchain in Supply Chain", gpa: 3.4 },
-    { id: "24998123", name: "Siti Nurhaliza", topic: "AR for Education", gpa: 3.8 },
-    { id: "25881029", name: "Rajesh Kumar", topic: "Cybersecurity Threat Detection", gpa: 3.2 }
+    { id: "25001009", name: "Liam Anderson", topic: "Blockchain in Supply Chain", gpa: 3.4 },
+    { id: "25001010", name: "Isabella Thomas", topic: "AR for Education", gpa: 3.8 },
+    { id: "25001011", name: "Mason Jackson", topic: "Cybersecurity Threat Detection", gpa: 3.2 }
   ]);
 
   const [faculty, setFaculty] = useState([
@@ -18,12 +18,9 @@ export default function SupervisorAssignment() {
 
   const handleAssign = (facultyId) => {
     if (unassignedStudents.length === 0) return;
-    const studentToAssign = unassignedStudents[0]; // Auto pick the first one
-
-    // Update students list
-    setUnassignedStudents(prev => prev.filter(s => s.id !== studentToAssign.id));
+    const studentToAssign = unassignedStudents[0];
     
-    // Update faculty load
+    setUnassignedStudents(prev => prev.filter(s => s.id !== studentToAssign.id));
     setFaculty(prev => prev.map(f => f.id === facultyId ? { ...f, currentLoad: f.currentLoad + 1 } : f));
     
     setAssignmentSuccess(true);
@@ -53,6 +50,7 @@ export default function SupervisorAssignment() {
               <p className="text-xs text-rose-600 mt-1">There are {unassignedStudents.length} students awaiting assignment.</p>
             </div>
           </div>
+
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800">Pending Students</h3>
@@ -102,6 +100,7 @@ export default function SupervisorAssignment() {
                       <p className="text-xs text-slate-500 truncate max-w-[150px]">{member.expertise}</p>
                     </div>
                   </div>
+                  
                   <div className="mb-4">
                     <div className="flex justify-between text-xs font-semibold mb-1.5">
                       <span className="text-slate-600">Current Load</span>
@@ -111,6 +110,7 @@ export default function SupervisorAssignment() {
                       <div className={`h-full rounded-full transition-all duration-500 ${isFull ? 'bg-rose-500' : capacityPercentage > 75 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${capacityPercentage}%` }}></div>
                     </div>
                   </div>
+                  
                   <button onClick={() => handleAssign(member.id)} disabled={isFull || unassignedStudents.length === 0} className={`w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${isFull || unassignedStudents.length === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200'}`}>
                     <UserPlus className="w-4 h-4 mr-2" /> {isFull ? 'Capacity Full' : 'Assign Top Student'}
                   </button>
