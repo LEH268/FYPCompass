@@ -1,13 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Search, Filter, ChevronRight } from "lucide-react";
+import { useData } from "../../context/DataContext";
 
 export default function CoordinatorStudents() {
   const navigate = useNavigate();
-  const students = [
-    { id: "25008442", name: "Lee Earn Hui", topic: "AI Healthcare", supervisor: "Dr. Alan Turing", status: "On Track" },
-    { id: "24127094", name: "Grace Wong", topic: "IoT Agriculture", supervisor: "Dr. Siti Aminah", status: "On Track" },
-    { id: "23011223", name: "John Doe", topic: "N/A", supervisor: "Unassigned", status: "At Risk" },
-  ];
+  const { students } = useData();
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -26,7 +23,6 @@ export default function CoordinatorStudents() {
           </button>
         </div>
       </div>
-
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -45,7 +41,11 @@ export default function CoordinatorStudents() {
                   <div className="text-xs text-slate-500">{s.id}</div>
                 </td>
                 <td className="p-4 text-slate-600 font-medium">{s.topic}</td>
-                <td className="p-4 text-slate-600 font-medium">{s.supervisor}</td>
+                <td className="p-4 text-slate-600 font-medium">
+                  <span className={s.supervisorName === 'Unassigned' ? 'text-rose-500 font-bold' : ''}>
+                    {s.supervisorName}
+                  </span>
+                </td>
                 <td className="p-4 text-right pr-5">
                   <button className="text-indigo-600 font-semibold hover:underline text-xs flex items-center justify-end w-full">
                     View <ChevronRight className="w-4 h-4 ml-1"/>

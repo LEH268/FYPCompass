@@ -1,30 +1,19 @@
 import { useState } from "react";
 import { UserPlus, AlertCircle, Search, CheckCircle } from "lucide-react";
+import { useData } from "../../context/DataContext";
 
 export default function SupervisorAssignment() {
+  const { students, faculty, assignSupervisor } = useData();
   const [assignmentSuccess, setAssignmentSuccess] = useState(false);
-  
-  const [unassignedStudents, setUnassignedStudents] = useState([
-    { id: "25011922", name: "Tan Ah Meng", topic: "Blockchain in Supply Chain", gpa: 3.4 },
-    { id: "24998123", name: "Siti Nurhaliza", topic: "AR for Education", gpa: 3.8 },
-    { id: "25881029", name: "Rajesh Kumar", topic: "Cybersecurity Threat Detection", gpa: 3.2 }
-  ]);
 
-  const [faculty, setFaculty] = useState([
-    { id: "F01", name: "Dr. Alan Turing", expertise: "AI, Machine Learning", currentLoad: 5, maxLoad: 8 },
-    { id: "F02", name: "Dr. Siti Aminah", expertise: "Blockchain, Fintech", currentLoad: 8, maxLoad: 8 },
-    { id: "F03", name: "Prof. John Smith", expertise: "Cybersecurity, Networking", currentLoad: 2, maxLoad: 6 },
-  ]);
+  // Dynamically filter students who have no assigned supervisor
+  const unassignedStudents = students.filter(s => !s.supervisorId || s.supervisorName === "Unassigned");
 
   const handleAssign = (facultyId) => {
     if (unassignedStudents.length === 0) return;
-    const studentToAssign = unassignedStudents[0]; // Auto pick the first one
-
-    // Update students list
-    setUnassignedStudents(prev => prev.filter(s => s.id !== studentToAssign.id));
+    const studentToAssign = unassignedStudents[0];
     
-    // Update faculty load
-    setFaculty(prev => prev.map(f => f.id === facultyId ? { ...f, currentLoad: f.currentLoad + 1 } : f));
+    assignSupervisor(studentToAssign.id, facultyId);
     
     setAssignmentSuccess(true);
     setTimeout(() => setAssignmentSuccess(false), 3000);
@@ -38,12 +27,10 @@ export default function SupervisorAssignment() {
           <span className="text-sm font-semibold">Student successfully assigned. Workload updated.</span>
         </div>
       )}
-
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Supervisor Allocation</h1>
         <p className="text-slate-500 mt-1">Manage faculty workload and assign pending students.</p>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
           <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex items-start shadow-sm">
@@ -77,14 +64,9 @@ export default function SupervisorAssignment() {
             </div>
           </div>
         </div>
-
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 className="text-lg font-bold text-slate-800">Faculty Capacity Dashboard</h3>
-            <div className="relative w-full sm:w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input type="text" placeholder="Search faculty..." className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none" />
-            </div>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
             {faculty.map((member) => {
@@ -102,6 +84,7 @@ export default function SupervisorAssignment() {
                       <p className="text-xs text-slate-500 truncate max-w-[150px]">{member.expertise}</p>
                     </div>
                   </div>
+                  
                   <div className="mb-4">
                     <div className="flex justify-between text-xs font-semibold mb-1.5">
                       <span className="text-slate-600">Current Load</span>
@@ -111,6 +94,7 @@ export default function SupervisorAssignment() {
                       <div className={`h-full rounded-full transition-all duration-500 ${isFull ? 'bg-rose-500' : capacityPercentage > 75 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${capacityPercentage}%` }}></div>
                     </div>
                   </div>
+                  
                   <button onClick={() => handleAssign(member.id)} disabled={isFull || unassignedStudents.length === 0} className={`w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${isFull || unassignedStudents.length === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200'}`}>
                     <UserPlus className="w-4 h-4 mr-2" /> {isFull ? 'Capacity Full' : 'Assign Top Student'}
                   </button>
