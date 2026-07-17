@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, AlertTriangle, CheckCircle, Clock, ChevronRight } from "lucide-react";
+import { Search, Filter, AlertTriangle, Clock, ChevronRight } from "lucide-react";
 
 export default function StudentProgress() {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ export default function StudentProgress() {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
               type="text" 
-              placeholder="Search student..." 
+              placeholder="Search student..."
               className="pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 outline-none w-full sm:w-64"
             />
           </div>
@@ -79,11 +79,15 @@ export default function StudentProgress() {
 
       <div className="grid grid-cols-1 gap-4">
         {filteredStudents.map((student) => (
-          <div key={student.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-200 hover:shadow-md transition-all flex flex-col md:flex-row gap-6 md:items-center">
+          <div 
+            key={student.id} 
+            onClick={() => navigate(`/supervisor/students/${student.id}`)}
+            className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all flex flex-col md:flex-row gap-6 md:items-center cursor-pointer group"
+          >
             
             <div className="flex-1">
               <div className="flex items-center mb-2">
-                <h3 className="text-lg font-bold text-slate-800 mr-3">{student.name}</h3>
+                <h3 className="text-lg font-bold text-slate-800 mr-3 group-hover:text-indigo-600 transition-colors">{student.name}</h3>
                 <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                   student.status === 'On Track' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
                 }`}>
@@ -125,18 +129,9 @@ export default function StudentProgress() {
               </div>
 
               <div className="flex space-x-2 pt-2">
-                <button 
-                  onClick={() => navigate('/supervisor/consultations')}
-                  className="flex-1 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded hover:bg-slate-50 transition-colors"
-                >
-                  Log Meeting
-                </button>
-                <button 
-                  onClick={() => navigate('/supervisor/feedback')}
-                  className="flex-1 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded hover:bg-indigo-100 transition-colors flex justify-center items-center"
-                >
-                  View Files <ChevronRight className="w-3 h-3 ml-1" />
-                </button>
+                <div className="w-full py-2 bg-indigo-50 text-indigo-700 text-xs font-semibold rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors flex justify-center items-center">
+                  Open Student Profile <ChevronRight className="w-3 h-3 ml-1" />
+                </div>
               </div>
             </div>
 
