@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup"; 
 import MainLayout from "./components/layout/MainLayout";
 
 // Student Pages
@@ -11,9 +12,12 @@ import ConsultationRecords from "./pages/student/ConsultationRecords";
 // Supervisor Pages
 import SupervisorDashboard from "./pages/supervisor/SupervisorDashboard";
 import StudentProgress from "./pages/supervisor/StudentProgress";
+import FeedbackManagement from "./pages/supervisor/FeedbackManagement";
+import SupervisorConsultation from "./pages/supervisor/SupervisorConsultation";
 
 // Coordinator Pages
 import CoordinatorDashboard from "./pages/coordinator/CoordinatorDashboard";
+import SupervisorAssignment from "./pages/coordinator/SupervisorAssignment";
 
 // Examiner Pages
 import ExaminerDashboard from "./pages/examiner/ExaminerDashboard";
@@ -23,9 +27,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Route */}
+        {/* Public Routes */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
         {/* Student Routes */}
         <Route path="/student" element={<MainLayout role="student" />}>
@@ -39,11 +44,14 @@ export default function App() {
         <Route path="/supervisor" element={<MainLayout role="supervisor" />}>
           <Route index element={<SupervisorDashboard />} />
           <Route path="students" element={<StudentProgress />} />
+          <Route path="feedback" element={<FeedbackManagement />} />
+          <Route path="consultations" element={<SupervisorConsultation />} />
         </Route>
 
         {/* Coordinator Routes */}
         <Route path="/coordinator" element={<MainLayout role="coordinator" />}>
           <Route index element={<CoordinatorDashboard />} />
+          <Route path="assignment" element={<SupervisorAssignment />} />
         </Route>
 
         {/* Examiner Routes */}
@@ -53,7 +61,14 @@ export default function App() {
         </Route>
 
         {/* Fallback 404 */}
-        <Route path="*" element={<div className="flex h-screen items-center justify-center text-2xl font-bold text-gray-500">404 - Page Not Found</div>} />
+        <Route 
+          path="*" 
+          element={
+            <div className="flex h-screen items-center justify-center text-2xl font-bold text-slate-500 bg-slate-50">
+              404 - Page Not Found
+            </div>
+          } 
+        />
       </Routes>
     </BrowserRouter>
   );

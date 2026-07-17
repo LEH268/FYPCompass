@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, Clock, CircleDashed, ArrowRight } from "lucide-react";
+import { CheckCircle, Clock, CircleDashed, ArrowRight, Eye } from "lucide-react";
 
 export default function MilestoneTimeline() {
   const navigate = useNavigate();
 
-  // Mock data based on your BIS2102 requirements
   const milestones = [
     {
       id: 1,
@@ -45,9 +44,9 @@ export default function MilestoneTimeline() {
 
   const getStatusIcon = (status) => {
     switch(status) {
-      case "completed": return <CheckCircle className="text-emerald-500 bg-white" size={28} />;
-      case "in-progress": return <Clock className="text-blue-500 bg-white" size={28} />;
-      default: return <CircleDashed className="text-slate-300 bg-white" size={28} />;
+      case "completed": return <CheckCircle className="text-emerald-500 bg-white rounded-full" size={28} />;
+      case "in-progress": return <Clock className="text-blue-500 bg-white rounded-full" size={28} />;
+      default: return <CircleDashed className="text-slate-300 bg-white rounded-full" size={28} />;
     }
   };
 
@@ -66,21 +65,23 @@ export default function MilestoneTimeline() {
               <div className="absolute -left-[15px] top-1">
                 {getStatusIcon(milestone.status)}
               </div>
-
+              
               {/* Content */}
               <div className={`p-5 rounded-xl border transition-all ${
                 milestone.status === 'in-progress' 
                   ? 'border-blue-200 bg-blue-50/50 shadow-sm ring-1 ring-blue-500/10' 
+                  : milestone.status === 'completed'
+                  ? 'border-emerald-100 bg-emerald-50/20 hover:border-emerald-200'
                   : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'
               }`}>
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-lg font-bold text-slate-800">{milestone.title}</h3>
                   <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold ${
-                    milestone.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                    milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
+                    milestone.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 
+                    milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-700' : 
                     'bg-slate-200 text-slate-600'
                   }`}>
-                    {milestone.status}
+                    {milestone.status.replace('-', ' ')}
                   </span>
                 </div>
                 
@@ -94,17 +95,17 @@ export default function MilestoneTimeline() {
                   {milestone.status === "in-progress" && (
                     <button 
                       onClick={() => navigate('/student/proposal')}
-                      className="text-blue-600 hover:text-blue-800 hover:underline flex items-center font-bold text-sm transition-colors"
+                      className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center font-bold text-sm transition-colors shadow-sm"
                     >
-                      Submit Deliverable <ArrowRight className="w-4 h-4 ml-1" />
+                      Submit Deliverable <ArrowRight className="w-4 h-4 ml-2" />
                     </button>
                   )}
                   {milestone.status === "completed" && (
                     <button 
-                      onClick={() => navigate('/student/feedback')}
-                      className="text-emerald-600 hover:text-emerald-800 hover:underline flex items-center font-bold text-sm transition-colors"
+                      onClick={() => navigate('/student/proposal')}
+                      className="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-4 py-2 rounded-lg flex items-center font-bold text-sm transition-colors"
                     >
-                      View Feedback <ArrowRight className="w-4 h-4 ml-1" />
+                      <Eye className="w-4 h-4 mr-2" /> View File & Feedback
                     </button>
                   )}
                 </div>

@@ -18,6 +18,7 @@ export default function Sidebar({ role }) {
           { name: "Dashboard", path: "/supervisor", icon: LayoutDashboard },
           { name: "My Students", path: "/supervisor/students", icon: Users },
           { name: "Feedback", path: "/supervisor/feedback", icon: MessageSquare },
+          { name: "Meetings", path: "/supervisor/consultations", icon: Users },
         ];
       case "examiner":
         return [
@@ -27,7 +28,8 @@ export default function Sidebar({ role }) {
       case "coordinator":
       default:
         return [
-          { name: "Dashboard", path: "/coordinator", icon: LayoutDashboard }
+          { name: "Dashboard", path: "/coordinator", icon: LayoutDashboard },
+          { name: "Assignments", path: "/coordinator/assignment", icon: Users },
         ];
     }
   };
@@ -40,7 +42,7 @@ export default function Sidebar({ role }) {
         <Compass className="h-7 w-7 text-indigo-600 mr-2" />
         <span className="text-xl font-bold text-slate-800">FYPCompass</span>
       </div>
-
+      
       <div className="flex-1 overflow-y-auto py-6 px-4">
         <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-2">
           Menu
@@ -65,12 +67,12 @@ export default function Sidebar({ role }) {
           ))}
         </nav>
       </div>
-
+      
       <div className="p-4 border-t border-slate-100 space-y-1">
         <button className="flex w-full items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
           <Settings className="h-5 w-5 mr-3" /> Settings
         </button>
-        <NavLink to="/login" className="flex w-full items-center px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+        <NavLink to="/login" className="flex w-full items-center px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-50 transition-colors">
           <LogOut className="h-5 w-5 mr-3" /> Logout
         </NavLink>
       </div>
