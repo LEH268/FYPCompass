@@ -5,29 +5,16 @@ import { useData } from "../../context/DataContext";
 export default function SupervisorAssignment() {
   const { students, faculty, assignSupervisor } = useData();
   const [assignmentSuccess, setAssignmentSuccess] = useState(false);
-  
-  const [unassignedStudents, setUnassignedStudents] = useState([
-    { id: "25011922", name: "Tan Ah Meng", topic: "Blockchain in Supply Chain", gpa: 3.4 },
-    { id: "24998123", name: "Siti Nurhaliza", topic: "AR for Education", gpa: 3.8 },
-    { id: "25881029", name: "Rajesh Kumar", topic: "Cybersecurity Threat Detection", gpa: 3.2 }
-  ]);
 
-  const [faculty, setFaculty] = useState([
-    { id: "F01", name: "Dr. Alan Turing", expertise: "AI, Machine Learning", currentLoad: 5, maxLoad: 8 },
-    { id: "F02", name: "Dr. Siti Aminah", expertise: "Blockchain, Fintech", currentLoad: 8, maxLoad: 8 },
-    { id: "F03", name: "Prof. John Smith", expertise: "Cybersecurity, Networking", currentLoad: 2, maxLoad: 6 },
-  ]);
+  // Dynamically filter students who have no assigned supervisor
+  const unassignedStudents = students.filter(s => !s.supervisorId || s.supervisorName === "Unassigned");
 
   const handleAssign = (facultyId) => {
     if (unassignedStudents.length === 0) return;
-    const studentToAssign = unassignedStudents[0]; // Auto pick the first one
-
-    // Update students list
-    setUnassignedStudents(prev => prev.filter(s => s.id !== studentToAssign.id));
+    const studentToAssign = unassignedStudents[0];
     
-    // Update faculty load
-    setFaculty(prev => prev.map(f => f.id === facultyId ? { ...f, currentLoad: f.currentLoad + 1 } : f));
-    
+    assignSupervisor(studentToAssign.id, facultyId);
+   
     setAssignmentSuccess(true);
     setTimeout(() => setAssignmentSuccess(false), 3000);
   };

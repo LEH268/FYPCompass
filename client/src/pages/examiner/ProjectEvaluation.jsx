@@ -10,12 +10,14 @@ export default function ProjectEvaluation() {
   const { students } = useData();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [grades, setGrades] = useState({ presentation: "", technical: "", documentation: "" });
+  
+  const student = students.find(s => s.id === id);
   const totalScore = (Number(grades.presentation) || 0) + (Number(grades.technical) || 0) + (Number(grades.documentation) || 0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitted(true);
-    // Simulate API updating grades and feedback
+    // Simulating save to context/backend
     setTimeout(() => navigate('/examiner'), 2000);
   };
 
@@ -40,7 +42,7 @@ export default function ProjectEvaluation() {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Official Evaluation Form</h1>
-            <p className="text-slate-500 text-sm">Grading rubric for {id || 'Lee Earn Hui'}</p>
+            <p className="text-slate-500 text-sm mt-1">Final grading rubric for <span className="font-bold text-slate-700">{student.name}</span></p>
           </div>
         </div>
         <div className="bg-purple-50 text-purple-700 px-6 py-3 rounded-xl font-black text-2xl border border-purple-100 shadow-sm flex items-center">
@@ -54,8 +56,7 @@ export default function ProjectEvaluation() {
            <h3 className="text-lg font-bold text-slate-800">Scoring Matrix</h3>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-8">
-          
-          <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
               <label className="block text-sm font-bold text-slate-800 mb-1">1. Presentation & Communication</label>
               <p className="text-xs text-slate-500 mb-2">Clarity, ability to answer questions, and slide quality.</p>

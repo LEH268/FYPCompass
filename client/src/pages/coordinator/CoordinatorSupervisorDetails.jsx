@@ -5,12 +5,18 @@ import { useData } from "../../context/DataContext";
 export default function CoordinatorSupervisorDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const supervisor = faculty.find(f => f.id === id);
+  const supervisees = students.filter(s => s.supervisorId === id);
 
-  const supervisees = [
-    { id: "25008442", name: "Lee Earn Hui", topic: "AI Healthcare", status: "On Track" },
-    { id: "24127094", name: "Grace Wong", topic: "IoT Agriculture", status: "On Track" },
-  ];
+      <div className="p-8 text-center animate-in fade-in">
+        <h2 className="text-2xl font-bold text-slate-800">Faculty Member Not Found</h2>
+        <button onClick={() => navigate(-1)} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg">Go Back</button>
+      </div>
+    );
+  }
 
+  const capacityPercentage = (supervisor.currentLoad / supervisor.maxLoad) * 100;
+  
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center">
@@ -45,7 +51,6 @@ export default function CoordinatorSupervisorDetails() {
         </div>
       </div>
 
-      {/* Assigned Students List */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center">
           <Users className="w-5 h-5 text-indigo-600 mr-2" />
