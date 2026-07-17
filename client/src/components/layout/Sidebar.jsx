@@ -1,9 +1,10 @@
-import { NavLink } from "react-router-dom";
-import { 
-  Compass, LayoutDashboard, Flag, FileUp, Users, MessageSquare, Settings, LogOut, ClipboardCheck, UserCog 
-} from "lucide-react";
+// src/components/layout/Sidebar.jsx
+import { NavLink, useNavigate } from "react-router-dom";
+import { Compass, LayoutDashboard, Flag, FileUp, Users, MessageSquare, Settings, LogOut, ClipboardCheck, UserCog } from "lucide-react";
 
 export default function Sidebar({ role }) {
+  const navigate = useNavigate();
+
   const getNavLinks = () => {
     switch (role) {
       case "student":
@@ -19,6 +20,7 @@ export default function Sidebar({ role }) {
           { name: "My Students", path: "/supervisor/students", icon: Users },
           { name: "Feedback", path: "/supervisor/feedback", icon: MessageSquare },
           { name: "Meetings", path: "/supervisor/consultations", icon: Users },
+          { name: "Settings", path: "/supervisor/settings", icon: Settings }, // <--- ADDED to main menu
         ];
       case "examiner":
         return [
@@ -37,6 +39,14 @@ export default function Sidebar({ role }) {
   };
 
   const links = getNavLinks();
+
+  const handleSettingsClick = () => {
+    if (role === "supervisor") {
+      navigate("/supervisor/settings");
+    } else {
+      alert("Settings module is under construction for this role.");
+    }
+  };
 
   return (
     <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0">
@@ -71,8 +81,8 @@ export default function Sidebar({ role }) {
       </div>
       
       <div className="p-4 border-t border-slate-100 space-y-1">
-        <button className="flex w-full items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
-          <Settings className="h-5 w-5 mr-3" /> Settings
+        <button onClick={handleSettingsClick} className="flex w-full items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
+          <Settings className="h-5 w-5 mr-3" /> System Settings
         </button>
         <NavLink to="/login" className="flex w-full items-center px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-50 transition-colors">
           <LogOut className="h-5 w-5 mr-3" /> Logout

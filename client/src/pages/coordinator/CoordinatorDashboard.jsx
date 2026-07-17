@@ -1,14 +1,16 @@
 // src/pages/coordinator/CoordinatorDashboard.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, UserCog, AlertTriangle, Download, ChevronRight } from "lucide-react";
+import { Users, UserCog, AlertTriangle, Download, ChevronRight, FileSpreadsheet, X, CheckCircle } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function CoordinatorDashboard() {
   const navigate = useNavigate();
   const { students, faculty } = useData();
   const [showExportModal, setShowExportModal] = useState(false);
-  
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportSuccess, setExportSuccess] = useState(false);
+
   const totalStudents = students.length;
   const activeSupervisors = faculty.length;
   const unassignedStudents = students.filter(s => !s.supervisorId || s.supervisorName === "Unassigned");
@@ -20,6 +22,19 @@ export default function CoordinatorDashboard() {
       case "Proposal Review": return "bg-blue-100 text-blue-700";
       default: return "bg-emerald-100 text-emerald-700";
     }
+  };
+
+  const handleExport = () => {
+    setIsExporting(true);
+    // Simulate export delay
+    setTimeout(() => {
+      setIsExporting(false);
+      setExportSuccess(true);
+      setTimeout(() => {
+        setExportSuccess(false);
+        setShowExportModal(false);
+      }, 2000);
+    }, 1500);
   };
 
   return (
@@ -42,7 +57,7 @@ export default function CoordinatorDashboard() {
           <p className="text-sm text-slate-500 font-medium mb-1">Total Students</p>
           <h3 className="text-3xl font-black text-slate-800">{totalStudents}</h3>
         </div>
-                 
+                  
         <div onClick={() => navigate('/coordinator/supervisors')} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer group">
           <div className="absolute right-0 top-0 w-16 h-16 bg-indigo-50/50 rounded-bl-full flex justify-end p-3">
             <UserCog className="h-6 w-6 text-indigo-500 opacity-80" />
@@ -110,6 +125,62 @@ export default function CoordinatorDashboard() {
           </table>
         </div>
       </div>
+
+      {/* Export Report Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            {exportSuccess ? (
+              <div className="p-8 text-center flex flex-col items-center">
+                <CheckCircle className="h-16 w-16 text-emerald-500 mb-4" />
+                <h3 className="text-xl font-bold text-slate-800">Report Generated!</h3>
+                <p className="text-sm text-slate-500 mt-2">The FYP Cohort Report has been downloaded to your device.</p>
+              </div>
+            ) : (
+              <>
+                <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                  <h2 className="text-lg font-bold text-slate-800">Generate Cohort Report</h2>
+                  <button onClick={() => setShowExportModal(false)} className="text-slate-400 hover:text-slate-600">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="p-6 space-y-4">
+                  <p className="text-sm text-slate-600">Select the format and data range for the cohort progress report.</p>
+                  
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Report Format</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button className="flex items-center justify-center p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-700 rounded-xl font-semibold text-sm">
+                        <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel (.xlsx)
+                      </button>
+                      <button className="flex items-center justify-center p-3 border border-slate-200 text-slate-600 rounded-xl font-semibold text-sm hover:bg-slate-50">
+                        PDF Document
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2 mt-4">Data Inclusion</label>
+                    <select className="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:border-indigo-600">
+                      <option>All Students (Complete Cohort)</option>
+                      <option>At Risk Students Only</option>
+                      <option>Pending Assignments Only</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
+                  <button onClick={() => setShowExportModal(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                    Cancel
+                  </button>
+                  <button onClick={handleExport} disabled={isExporting} className="px-5 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition-colors flex items-center">
+                    {isExporting ? 'Generating...' : 'Download Report'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

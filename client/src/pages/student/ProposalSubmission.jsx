@@ -1,7 +1,7 @@
 // src/pages/student/ProposalSubmission.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UploadCloud, FileText, CheckCircle, X, Download, Send } from "lucide-react";
+import { UploadCloud, FileText, CheckCircle, X, Download, Send, Save, ShieldAlert } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function ProposalSubmission() {
@@ -11,6 +11,7 @@ export default function ProposalSubmission() {
   const [studentMessage, setStudentMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isDraft, setIsDraft] = useState(false);
 
   // Filter submissions for current mocked student (Oliver Smith)
   const mySubmissions = submissions.filter(sub => sub.studentId === "25001001").sort((a,b) => b.id - a.id);
@@ -21,10 +22,12 @@ export default function ProposalSubmission() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, draft = false) => {
     e.preventDefault();
     if (!file) return;
     setIsSubmitting(true);
+    setIsDraft(draft);
+    
     setTimeout(() => {
       addSubmission({
         studentId: "25001001",
@@ -32,7 +35,9 @@ export default function ProposalSubmission() {
         milestone: "System Design Specification (SDS)",
         file: file.name,
         date: new Date().toISOString().split('T')[0],
-        studentMessage: studentMessage
+        studentMessage: studentMessage,
+        status: draft ? "Draft" : "Pending Review",
+        similarityScore: draft ? null : Math.floor(Math.random() * 15) + 5 // Mock Turnitin Score 5-20%
       });
       setIsSubmitting(false);
       setSubmitted(true);
@@ -46,11 +51,13 @@ export default function ProposalSubmission() {
         <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6 shadow-sm border border-emerald-200">
           <CheckCircle className="w-10 h-10" />
         </div>
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Deliverable Submitted!</h2>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">
+          {isDraft ? "Draft Saved Successfully!" : "Deliverable Submitted!"}
+        </h2>
         <p className="text-slate-500 mb-8 text-center max-w-md">
-          Your file and message have been securely routed to your supervisor.
+          {isDraft ? "You can continue editing this draft later before final submission." : "Your file and message have been securely routed to your supervisor."}
         </p>
-        <button onClick={() => {setSubmitted(false); setFile(null);}} className="px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
+        <button onClick={() => {setSubmitted(false); setFile(null); setIsDraft(false);}} className="px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
           Upload Another Document
         </button>
       </div>
@@ -61,11 +68,11 @@ export default function ProposalSubmission() {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Submissions & Deliverables</h1>
-        <p className="text-slate-500 mt-1">Upload active deliverables and review past feedback.</p>
+        <p className="text-slate-500 mt-1">Upload active deliverables, save drafts, and review past feedback.</p>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form className="p-6 space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Upload Document</label>
             {!file ? (
@@ -87,6 +94,7 @@ export default function ProposalSubmission() {
               </div>
             )}
           </div>
+
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Message to Supervisor (Optional)</label>
             <textarea 
@@ -97,9 +105,25 @@ export default function ProposalSubmission() {
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none resize-none text-sm"
             ></textarea>
           </div>
-          <button type="submit" disabled={!file || isSubmitting} className="w-full flex justify-center items-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 disabled:bg-slate-300 transition-all">
-            {isSubmitting ? 'Uploading...' : <><Send className="w-4 h-4 mr-2" /> Submit Deliverable</>}
-          </button>
+
+          <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <button 
+              type="button" 
+              onClick={(e) => handleSubmit(e, true)} 
+              disabled={!file || isSubmitting} 
+              className="flex-1 flex justify-center items-center px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 disabled:opacity-50 transition-all"
+            >
+              <Save className="w-4 h-4 mr-2" /> Save as Draft
+            </button>
+            <button 
+              type="button" 
+              onClick={(e) => handleSubmit(e, false)} 
+              disabled={!file || isSubmitting} 
+              className="flex-1 flex justify-center items-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-md"
+            >
+              {isSubmitting && !isDraft ? 'Uploading...' : <><Send className="w-4 h-4 mr-2" /> Submit Deliverable</>}
+            </button>
+          </div>
         </form>
       </div>
 
@@ -113,7 +137,11 @@ export default function ProposalSubmission() {
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-bold text-slate-800">{sub.milestone}</h3>
-                  <span className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded ${sub.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : sub.status === 'Pending Review' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                  <span className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded ${
+                    sub.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : 
+                    sub.status === 'Draft' ? 'bg-slate-100 text-slate-600' :
+                    sub.status === 'Pending Review' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
+                  }`}>
                     {sub.status}
                   </span>
                 </div>
@@ -127,6 +155,17 @@ export default function ProposalSubmission() {
                   <button className="text-slate-400 hover:text-indigo-600 transition-colors"><Download className="w-4 h-4" /></button>
                 </div>
                 
+                {/* Plagiarism Integration UI */}
+                {sub.status !== 'Draft' && (
+                  <div className="flex items-center gap-2 mb-4 p-2 bg-blue-50/50 rounded-lg border border-blue-100">
+                    <ShieldAlert className="w-4 h-4 text-blue-500" />
+                    <span className="text-xs font-semibold text-slate-600">Turnitin Similarity:</span>
+                    <span className={`text-xs font-bold ${sub.similarityScore > 20 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                      {sub.similarityScore || Math.floor(Math.random() * 15) + 5}%
+                    </span>
+                  </div>
+                )}
+
                 {sub.studentMessage && (
                   <div className="mt-2">
                     <p className="text-xs font-bold text-slate-500">Your Message:</p>
@@ -134,7 +173,6 @@ export default function ProposalSubmission() {
                   </div>
                 )}
               </div>
-
               {sub.feedback && (
                 <div className="flex-1 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
                   <p className="text-xs font-bold text-indigo-800 mb-2">Supervisor Feedback:</p>

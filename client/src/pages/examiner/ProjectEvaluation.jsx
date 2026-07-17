@@ -1,7 +1,7 @@
 // src/pages/examiner/ProjectEvaluation.jsx
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, CheckCircle, FileSignature } from "lucide-react";
+import { ArrowLeft, Save, CheckCircle, FileSignature, Clock } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function ProjectEvaluation() {
@@ -9,16 +9,22 @@ export default function ProjectEvaluation() {
   const { id } = useParams();
   const { students } = useData();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isDraftSaved, setIsDraftSaved] = useState(false);
   const [grades, setGrades] = useState({ presentation: "", technical: "", documentation: "" });
-  
+
   const student = students.find(s => s.id === id);
   const totalScore = (Number(grades.presentation) || 0) + (Number(grades.technical) || 0) + (Number(grades.documentation) || 0);
 
-  const handleSubmit = (e) => {
+  const handleFinalize = (e) => {
     e.preventDefault();
     setIsSubmitted(true);
-    // Simulating save to context/backend
     setTimeout(() => navigate('/examiner'), 2000);
+  };
+
+  const handleSaveDraft = (e) => {
+    e.preventDefault();
+    setIsDraftSaved(true);
+    setTimeout(() => setIsDraftSaved(false), 3000);
   };
 
   if (isSubmitted) {
@@ -34,7 +40,15 @@ export default function ProjectEvaluation() {
   if (!student) return <div className="p-8 text-center">Candidate not found.</div>;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-500">
+    <div className="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-500 relative">
+      {/* Draft Saved Toast */}
+      {isDraftSaved && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center z-50 animate-in slide-in-from-top-5 duration-300">
+          <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
+          <span className="text-sm font-semibold">Evaluation draft saved securely.</span>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center">
           <button onClick={() => navigate(-1)} className="p-2 mr-3 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-600 shadow-sm">
@@ -55,16 +69,16 @@ export default function ProjectEvaluation() {
            <FileSignature className="w-5 h-5 mr-2 text-purple-600"/>
            <h3 className="text-lg font-bold text-slate-800">Scoring Matrix</h3>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+        <form className="p-6 space-y-8">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
               <label className="block text-sm font-bold text-slate-800 mb-1">1. Presentation & Communication</label>
               <p className="text-xs text-slate-500 mb-2">Clarity, ability to answer questions, and slide quality.</p>
-              <textarea required rows="2" placeholder="Examiner comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-purple-500 resize-none"></textarea>
+              <textarea rows="2" placeholder="Examiner comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-purple-500 resize-none"></textarea>
             </div>
             <div className="w-full md:w-32 flex-shrink-0">
               <label className="block text-sm font-bold text-slate-800 mb-1 text-right">Score / 20</label>
-              <input type="number" max="20" min="0" required value={grades.presentation} onChange={(e) => setGrades({...grades, presentation: e.target.value})} className="w-full p-3 bg-white border border-slate-300 rounded-lg text-lg font-bold text-center outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 shadow-inner" />
+              <input type="number" max="20" min="0" value={grades.presentation} onChange={(e) => setGrades({...grades, presentation: e.target.value})} className="w-full p-3 bg-white border border-slate-300 rounded-lg text-lg font-bold text-center outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 shadow-inner" />
             </div>
           </div>
           
@@ -72,11 +86,11 @@ export default function ProjectEvaluation() {
             <div className="flex-1">
               <label className="block text-sm font-bold text-slate-800 mb-1">2. Technical Implementation</label>
               <p className="text-xs text-slate-500 mb-2">Code quality, system complexity, and successful deployment.</p>
-              <textarea required rows="2" placeholder="Examiner comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-purple-500 resize-none"></textarea>
+              <textarea rows="2" placeholder="Examiner comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-purple-500 resize-none"></textarea>
             </div>
             <div className="w-full md:w-32 flex-shrink-0">
               <label className="block text-sm font-bold text-slate-800 mb-1 text-right">Score / 50</label>
-              <input type="number" max="50" min="0" required value={grades.technical} onChange={(e) => setGrades({...grades, technical: e.target.value})} className="w-full p-3 bg-white border border-slate-300 rounded-lg text-lg font-bold text-center outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 shadow-inner" />
+              <input type="number" max="50" min="0" value={grades.technical} onChange={(e) => setGrades({...grades, technical: e.target.value})} className="w-full p-3 bg-white border border-slate-300 rounded-lg text-lg font-bold text-center outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 shadow-inner" />
             </div>
           </div>
           
@@ -84,16 +98,19 @@ export default function ProjectEvaluation() {
             <div className="flex-1">
               <label className="block text-sm font-bold text-slate-800 mb-1">3. Documentation & Report</label>
               <p className="text-xs text-slate-500 mb-2">Thesis formatting, literature review, and accurate citations.</p>
-              <textarea required rows="2" placeholder="Examiner comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-purple-500 resize-none"></textarea>
+              <textarea rows="2" placeholder="Examiner comments..." className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-purple-500 resize-none"></textarea>
             </div>
             <div className="w-full md:w-32 flex-shrink-0">
               <label className="block text-sm font-bold text-slate-800 mb-1 text-right">Score / 30</label>
-              <input type="number" max="30" min="0" required value={grades.documentation} onChange={(e) => setGrades({...grades, documentation: e.target.value})} className="w-full p-3 bg-white border border-slate-300 rounded-lg text-lg font-bold text-center outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 shadow-inner" />
+              <input type="number" max="30" min="0" value={grades.documentation} onChange={(e) => setGrades({...grades, documentation: e.target.value})} className="w-full p-3 bg-white border border-slate-300 rounded-lg text-lg font-bold text-center outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 shadow-inner" />
             </div>
           </div>
           
-          <div className="pt-6 border-t border-slate-100 flex justify-end">
-            <button type="submit" disabled={totalScore === 0} className="flex items-center px-8 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-all shadow-lg active:scale-95 disabled:bg-slate-300 disabled:cursor-not-allowed">
+          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-end gap-4">
+            <button type="button" onClick={handleSaveDraft} className="flex items-center px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition-all shadow-sm">
+              <Clock className="w-5 h-5 mr-2" /> Save Draft
+            </button>
+            <button type="button" onClick={handleFinalize} disabled={totalScore === 0} className="flex items-center px-8 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-all shadow-lg active:scale-95 disabled:bg-slate-300 disabled:cursor-not-allowed">
               <Save className="w-5 h-5 mr-2" /> Finalize Grade & Publish
             </button>
           </div>
