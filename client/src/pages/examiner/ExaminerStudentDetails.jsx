@@ -5,9 +5,7 @@ import { ArrowLeft, User, FileText, Download, FileSignature, MessageSquare, Load
 export default function ExaminerStudentDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
-  
-  // Interactive Download State
-  const [downloadState, setDownloadState] = useState("idle"); // 'idle' | 'downloading' | 'done'
+  const [downloadState, setDownloadState] = useState("idle");
 
   const handleDownload = () => {
     setDownloadState("downloading");
@@ -33,13 +31,12 @@ export default function ExaminerStudentDetails() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
         <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center h-fit">
           <div className="w-24 h-24 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
             <User className="w-10 h-10" />
           </div>
-          <h2 className="text-xl font-bold text-slate-800">Lee Earn Hui</h2>
-          <p className="text-sm text-slate-500 mb-4">{id || '25008442'}</p>
+          <h2 className="text-xl font-bold text-slate-800">Oliver Smith</h2>
+          <p className="text-sm text-slate-500 mb-4">{id || '25001001'}</p>
           <div className="text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Supervisor</p>
             <p className="text-sm font-semibold text-slate-700 mb-3">Dr. Alan Turing</p>
@@ -48,7 +45,6 @@ export default function ExaminerStudentDetails() {
           </div>
         </div>
 
-        {/* Deliverables & Supervisor Feedback */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-5 border-b border-slate-100 bg-slate-50/50">
@@ -61,13 +57,12 @@ export default function ExaminerStudentDetails() {
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-purple-50 text-purple-600 rounded-lg"><FileText className="w-6 h-6" /></div>
                     <div>
-                      <h4 className="font-bold text-slate-800">Final_Report_EarnHui.pdf</h4>
+                      <h4 className="font-bold text-slate-800">Final_Report_Oliver.pdf</h4>
                       <p className="text-xs text-slate-500">Submitted: Yesterday • 4.2 MB</p>
                     </div>
                   </div>
                   
-                  {/* Interactive Download Button */}
-                  <button 
+                  <button
                     onClick={handleDownload}
                     disabled={downloadState !== "idle"}
                     className={`px-4 py-2 text-xs font-semibold rounded-lg flex items-center transition-colors ${
@@ -78,9 +73,8 @@ export default function ExaminerStudentDetails() {
                     {downloadState === "downloading" && <><Loader2 className="w-3 h-3 mr-2 animate-spin" /> Downloading...</>}
                     {downloadState === "done" && <><Check className="w-3 h-3 mr-2" /> Downloaded</>}
                   </button>
-
                 </div>
-                {/* Embedded Supervisor Feedback */}
+                
                 <div className="p-5 bg-slate-50 flex items-start gap-3">
                   <MessageSquare className="w-5 h-5 text-indigo-500 mt-0.5" />
                   <div>

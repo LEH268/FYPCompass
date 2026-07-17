@@ -3,10 +3,11 @@ import { Search, Filter, ChevronRight } from "lucide-react";
 
 export default function CoordinatorStudents() {
   const navigate = useNavigate();
+
   const students = [
-    { id: "25008442", name: "Lee Earn Hui", topic: "AI Healthcare", supervisor: "Dr. Alan Turing", status: "On Track" },
-    { id: "24127094", name: "Grace Wong", topic: "IoT Agriculture", supervisor: "Dr. Siti Aminah", status: "On Track" },
-    { id: "23011223", name: "John Doe", topic: "N/A", supervisor: "Unassigned", status: "At Risk" },
+    { id: "25001001", name: "Oliver Smith", topic: "AI Healthcare", supervisor: "Dr. Alan Turing", status: "On Track" },
+    { id: "25001002", name: "Emma Johnson", topic: "IoT Agriculture", supervisor: "Dr. Siti Aminah", status: "On Track" },
+    { id: "25001006", name: "Ava Taylor", topic: "N/A", supervisor: "Unassigned", status: "At Risk" },
   ];
 
   return (

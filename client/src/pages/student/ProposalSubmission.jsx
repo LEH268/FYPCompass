@@ -8,13 +8,12 @@ export default function ProposalSubmission() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Mock past submissions data
   const pastSubmissions = [
     {
       id: 1,
       milestone: "Project Proposal",
       submittedOn: "Oct 12, 2026",
-      fileName: "EarnHui_Proposal_Final.pdf",
+      fileName: "Oliver_Proposal_Final.pdf",
       fileSize: "2.4 MB",
       status: "Approved",
       feedback: "The project idea is relevant and objectives are clear. Continue with detailed system design. Approved.",
@@ -41,16 +40,13 @@ export default function ProposalSubmission() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!file) return;
-    
     setIsSubmitting(true);
-    // Simulate API upload
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitted(true);
     }, 1500);
   };
 
-  // FIX: Reset both the screen and the file attachment
   const handleSubmitAnother = () => {
     setFile(null);
     setSubmitted(false);
@@ -67,16 +63,10 @@ export default function ProposalSubmission() {
           Your deliverable has been securely uploaded and routed to your supervisor for evaluation.
         </p>
         <div className="flex gap-4">
-          <button 
-            onClick={handleSubmitAnother}
-            className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
-          >
+          <button onClick={handleSubmitAnother} className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
             Submit Another File
           </button>
-          <button 
-            onClick={() => navigate('/student/milestones')}
-            className="px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md"
-          >
+          <button onClick={() => navigate('/student/milestones')} className="px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
             Return to Timeline
           </button>
         </div>
@@ -86,7 +76,6 @@ export default function ProposalSubmission() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
-      
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Submissions & Deliverables</h1>
@@ -94,7 +83,6 @@ export default function ProposalSubmission() {
         </div>
       </div>
 
-      {/* ACTIVE SUBMISSION SECTION */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-100 bg-blue-50/30">
           <div className="flex justify-between items-start">
@@ -111,16 +99,10 @@ export default function ProposalSubmission() {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Submission Comments (Optional)</label>
-            <textarea 
-              rows="3" 
-              placeholder="Add any notes for your supervisor here regarding this deliverable..."
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all resize-none text-sm"
-            ></textarea>
+            <textarea rows="3" placeholder="Add any notes for your supervisor here regarding this deliverable..." className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all resize-none text-sm"></textarea>
           </div>
-
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">Upload Document</label>
-            
             {!file ? (
               <div className="mt-1 flex justify-center px-6 pt-10 pb-12 border-2 border-slate-300 border-dashed rounded-xl hover:border-indigo-500 hover:bg-indigo-50/50 transition-colors group relative cursor-pointer">
                 <div className="space-y-2 text-center">
@@ -146,17 +128,12 @@ export default function ProposalSubmission() {
                     <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                   </div>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={() => setFile(null)}
-                  className="p-1.5 hover:bg-indigo-100 rounded-lg transition-colors text-slate-500 hover:text-rose-600"
-                >
+                <button type="button" onClick={() => setFile(null)} className="p-1.5 hover:bg-indigo-100 rounded-lg transition-colors text-slate-500 hover:text-rose-600">
                   <X className="w-5 h-5" />
                 </button>
               </div>
             )}
           </div>
-
           <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
             <div className="flex items-center text-xs text-slate-500">
               <AlertCircle className="w-4 h-4 mr-1 text-amber-500" /> Ensure all components match the grading rubric.
@@ -164,9 +141,7 @@ export default function ProposalSubmission() {
             <button
               type="submit"
               disabled={!file || isSubmitting}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all shadow-md ${
-                !file ? 'bg-slate-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg active:scale-95'
-              }`}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all shadow-md ${!file ? 'bg-slate-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg active:scale-95'}`}
             >
               {isSubmitting ? 'Uploading...' : 'Submit Deliverable'}
             </button>
@@ -174,13 +149,11 @@ export default function ProposalSubmission() {
         </form>
       </div>
 
-      {/* PAST SUBMISSIONS & FEEDBACK SECTION */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 mb-4">Past Submissions & Feedback</h2>
         <div className="space-y-4">
           {pastSubmissions.map((sub) => (
             <div key={sub.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6">
-              
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-md font-bold text-slate-800">{sub.milestone}</h3>
@@ -189,8 +162,6 @@ export default function ProposalSubmission() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 mb-4">Submitted on: {sub.submittedOn}</p>
-                
-                {/* Embedded File View */}
                 <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg mb-4">
                   <div className="flex items-center space-x-3">
                     <FileText className="w-5 h-5 text-indigo-500" />
@@ -204,8 +175,6 @@ export default function ProposalSubmission() {
                   </button>
                 </div>
               </div>
-
-              {/* Feedback Block */}
               <div className="flex-1 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100/50">
                 <div className="flex items-center mb-2">
                   <MessageSquare className="w-4 h-4 text-indigo-600 mr-2" />
@@ -216,7 +185,6 @@ export default function ProposalSubmission() {
                 </p>
                 <p className="text-xs text-slate-500 mt-3 text-right">- {sub.supervisor}</p>
               </div>
-
             </div>
           ))}
         </div>

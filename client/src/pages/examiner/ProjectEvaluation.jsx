@@ -6,14 +6,13 @@ export default function ProjectEvaluation() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [isSubmitted, setIsSubmitted] = useState(false);
-  
   const [grades, setGrades] = useState({ presentation: "", technical: "", documentation: "" });
+
   const totalScore = (Number(grades.presentation) || 0) + (Number(grades.technical) || 0) + (Number(grades.documentation) || 0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitted(true);
-    // Simulate API updating grades and feedback
     setTimeout(() => navigate('/examiner'), 2000);
   };
 
@@ -36,7 +35,7 @@ export default function ProjectEvaluation() {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Official Evaluation Form</h1>
-            <p className="text-slate-500 text-sm">Grading rubric for {id || 'Lee Earn Hui'}</p>
+            <p className="text-slate-500 text-sm">Grading rubric for {id || 'Oliver Smith'}</p>
           </div>
         </div>
         <div className="bg-purple-50 text-purple-700 px-4 py-2 rounded-lg font-black text-xl border border-purple-100 shadow-inner">
@@ -50,7 +49,6 @@ export default function ProjectEvaluation() {
            <h3 className="text-lg font-bold text-slate-800">Scoring Matrix</h3>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-8">
-          
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="flex-1">
               <label className="block text-sm font-bold text-slate-800 mb-1">Presentation & Communication</label>
