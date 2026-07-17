@@ -1,3 +1,4 @@
+// src/pages/coordinator/SupervisorAssignment.jsx
 import { useState } from "react";
 import { UserPlus, AlertCircle, Search, CheckCircle } from "lucide-react";
 import { useData } from "../../context/DataContext";
@@ -5,16 +6,17 @@ import { useData } from "../../context/DataContext";
 export default function SupervisorAssignment() {
   const { students, faculty, assignSupervisor } = useData();
   const [assignmentSuccess, setAssignmentSuccess] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Dynamically filter students who have no assigned supervisor
   const unassignedStudents = students.filter(s => !s.supervisorId || s.supervisorName === "Unassigned");
+  const filteredFaculty = faculty.filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()) || f.expertise.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleAssign = (facultyId) => {
     if (unassignedStudents.length === 0) return;
     const studentToAssign = unassignedStudents[0];
     
     assignSupervisor(studentToAssign.id, facultyId);
-   
+    
     setAssignmentSuccess(true);
     setTimeout(() => setAssignmentSuccess(false), 3000);
   };
@@ -31,16 +33,25 @@ export default function SupervisorAssignment() {
         <h1 className="text-2xl font-bold text-slate-800">Supervisor Allocation</h1>
         <p className="text-slate-500 mt-1">Manage faculty workload and assign pending students.</p>
       </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex items-start shadow-sm">
-            <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5 mr-3 flex-shrink-0" />
+          <div className={`border rounded-xl p-4 flex items-start shadow-sm ${unassignedStudents.length > 0 ? 'bg-rose-50 border-rose-200' : 'bg-emerald-50 border-emerald-200'}`}>
+            {unassignedStudents.length > 0 ? (
+              <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5 mr-3 flex-shrink-0" />
+            ) : (
+              <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5 mr-3 flex-shrink-0" />
+            )}
             <div>
-              <h3 className="text-sm font-bold text-rose-800">Action Required</h3>
-              <p className="text-xs text-rose-600 mt-1">There are {unassignedStudents.length} students awaiting assignment.</p>
+              <h3 className={`text-sm font-bold ${unassignedStudents.length > 0 ? 'text-rose-800' : 'text-emerald-800'}`}>
+                {unassignedStudents.length > 0 ? 'Action Required' : 'All Clear'}
+              </h3>
+              <p className={`text-xs mt-1 ${unassignedStudents.length > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                {unassignedStudents.length} students awaiting assignment.
+              </p>
             </div>
           </div>
-
+          
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800">Pending Students</h3>
@@ -65,12 +76,18 @@ export default function SupervisorAssignment() {
             </div>
           </div>
         </div>
+        
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 className="text-lg font-bold text-slate-800">Faculty Capacity Dashboard</h3>
+            <div className="relative w-full sm:w-64">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input type="text" placeholder="Search faculty or expertise..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:border-indigo-500" />
+            </div>
           </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-            {faculty.map((member) => {
+          
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto max-h-[700px]">
+            {filteredFaculty.map((member) => {
               const capacityPercentage = (member.currentLoad / member.maxLoad) * 100;
               const isFull = member.currentLoad >= member.maxLoad;
               
@@ -92,11 +109,11 @@ export default function SupervisorAssignment() {
                       <span className={isFull ? 'text-rose-600 font-bold' : 'text-slate-800'}>{member.currentLoad} / {member.maxLoad} Students</span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                      <div className={`h-full rounded-full transition-all duration-500 ${isFull ? 'bg-rose-500' : capacityPercentage > 75 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${capacityPercentage}%` }}></div>
+                      <div className={`h-full rounded-full transition-all duration-500 ${isFull ? 'bg-rose-500' : capacityPercentage >= 75 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${capacityPercentage}%` }}></div>
                     </div>
                   </div>
                   
-                  <button onClick={() => handleAssign(member.id)} disabled={isFull || unassignedStudents.length === 0} className={`w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${isFull || unassignedStudents.length === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200'}`}>
+                  <button onClick={() => handleAssign(member.id)} disabled={isFull || unassignedStudents.length === 0} className={`w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${isFull || unassignedStudents.length === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 shadow-sm'}`}>
                     <UserPlus className="w-4 h-4 mr-2" /> {isFull ? 'Capacity Full' : 'Assign Top Student'}
                   </button>
                 </div>

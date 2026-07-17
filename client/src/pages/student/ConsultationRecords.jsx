@@ -1,3 +1,4 @@
+// src/pages/student/ConsultationRecords.jsx
 import { useState, useMemo } from "react";
 import { Users, Calendar, Clock, PlusCircle, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { useData } from "../../context/DataContext";
@@ -17,7 +18,7 @@ export default function ConsultationRecords() {
       .sort((a, b) => {
         const dateA = new Date(`${a.date}T${a.time}`);
         const dateB = new Date(`${b.date}T${b.time}`);
-        return dateA - dateB;
+        return dateB - dateA; // Most recent first
       });
   }, [myConsultations, searchQuery]);
 
@@ -31,7 +32,7 @@ export default function ConsultationRecords() {
       topic: e.target.topic.value,
       summary: e.target.notes.value,
       actionItems: "Pending supervisor review",
-      status: "Pending Verification"
+      status: "Upcoming"
     });
     setShowModal(false);
   };
@@ -46,7 +47,7 @@ export default function ConsultationRecords() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Consultation Records</h1>
-          <p className="text-slate-500 mt-1">Log your supervisor meetings to track progress.</p>
+          <p className="text-slate-500 mt-1">Log your supervisor meetings and track action items.</p>
         </div>
         <button onClick={() => setShowModal(true)} className="flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 shadow-md transition-all active:scale-95">
           <PlusCircle className="w-4 h-4 mr-2" /> Book / Log Session
@@ -88,7 +89,7 @@ export default function ConsultationRecords() {
                         <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100 leading-relaxed">{log.summary}</p>
                       </div>
                       <div className="mt-3">
-                        <p className="text-xs font-bold text-indigo-700 mb-1">Action Items:</p>
+                        <p className="text-xs font-bold text-indigo-700 mb-1">Supervisor Action Items:</p>
                         <p className="text-sm text-indigo-800 bg-indigo-50 p-3 rounded-lg border border-indigo-100 italic leading-relaxed">{log.actionItems}</p>
                       </div>
                     </div>
@@ -130,11 +131,11 @@ export default function ConsultationRecords() {
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">Discussion Topic</label>
-                <input name="topic" type="text" required className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600" />
+                <input name="topic" type="text" required placeholder="e.g. Needs help with Data Cleaning" className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Meeting Notes / Agenda</label>
-                <textarea name="notes" rows="4" required className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600 resize-none"></textarea>
+                <label className="block text-sm font-bold text-slate-700 mb-1">Meeting Agenda / Notes</label>
+                <textarea name="notes" rows="4" required placeholder="What do you want to discuss?" className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600 resize-none"></textarea>
               </div>
               <div className="pt-4 flex justify-end space-x-3">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">Cancel</button>
