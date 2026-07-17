@@ -4,10 +4,10 @@ import { useData } from "../../context/DataContext";
 
 export default function ExaminerStudents() {
   const navigate = useNavigate();
-  const { students } = useData();
-
-  // Mock logged-in Examiner: Prof. John Smith
-  const myAssignedStudents = students.filter(s => s.examinerName === "Prof. John Smith");
+  const students = [
+    { id: "25008442", name: "Lee Earn Hui", topic: "AI Healthcare", type: "Final Report", status: "Pending" },
+    { id: "24127094", name: "Grace Wong", topic: "IoT Agriculture", type: "Viva Presentation", status: "Upcoming" },
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">

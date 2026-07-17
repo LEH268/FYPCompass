@@ -7,9 +7,27 @@ export default function SupervisorConsultation() {
   const [showModal, setShowModal] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // Filter only supervisees belonging to this mocked supervisor (Dr. Alan Turing context -> F01)
-  const mySupervisees = students.filter(s => s.supervisorId === "F01");
+
+  const [logs, setLogs] = useState([
+    {
+      id: 1,
+      studentName: "Lee Earn Hui",
+      date: "2026-07-16",
+      time: "10:00",
+      topic: "System Design Review",
+      summary: "Reviewed the Class and Sequence diagrams. Suggested modifications to the Feedback loop logic to ensure coordinator visibility.",
+      actionItems: "Update Figure 2 Sequence Diagram. Finalize database schema."
+    },
+    {
+      id: 2,
+      studentName: "Grace Wong",
+      date: "2026-07-18",
+      time: "14:30",
+      topic: "IoT Sensor Troubleshooting",
+      summary: "Upcoming meeting to discuss hardware integration issues.",
+      actionItems: "Student to bring the ESP32 board and current codebase."
+    }
+  ]);
 
   const sortedLogs = useMemo(() => {
     return [...consultations]
@@ -107,6 +125,14 @@ export default function SupervisorConsultation() {
                     </div>
                   </div>
                 )}
+                
+                {expandedId !== log.id && (
+                  <div className="flex justify-end">
+                    <button className="text-xs font-semibold text-indigo-500 hover:text-indigo-700 flex items-center transition-colors">
+                      View Notes <ChevronDown size={14} className="ml-1"/>
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -117,7 +143,8 @@ export default function SupervisorConsultation() {
           )}
         </div>
       </div>
-      
+
+      {/* NEW SESSION MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
@@ -130,9 +157,9 @@ export default function SupervisorConsultation() {
                 <label className="block text-sm font-bold text-slate-700 mb-1">Select Student</label>
                 <select name="studentId" required className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-sm bg-white">
                   <option value="">-- Choose Supervisee --</option>
-                  {mySupervisees.map(s => (
-                    <option key={s.id} value={s.id}>{s.name} ({s.id})</option>
-                  ))}
+                  <option value="Lee Earn Hui">Lee Earn Hui (25008442)</option>
+                  <option value="Grace Wong Xin En">Grace Wong Xin En (24127094)</option>
+                  <option value="Muhammad Amirul">Muhammad Amirul (23068810)</option>
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">

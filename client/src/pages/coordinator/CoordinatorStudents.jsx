@@ -4,7 +4,11 @@ import { useData } from "../../context/DataContext";
 
 export default function CoordinatorStudents() {
   const navigate = useNavigate();
-  const { students } = useData();
+  const students = [
+    { id: "25008442", name: "Lee Earn Hui", topic: "AI Healthcare", supervisor: "Dr. Alan Turing", status: "On Track" },
+    { id: "24127094", name: "Grace Wong", topic: "IoT Agriculture", supervisor: "Dr. Siti Aminah", status: "On Track" },
+    { id: "23011223", name: "John Doe", topic: "N/A", supervisor: "Unassigned", status: "At Risk" },
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">

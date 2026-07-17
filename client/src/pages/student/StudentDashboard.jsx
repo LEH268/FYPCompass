@@ -13,7 +13,7 @@ export default function StudentDashboard() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Welcome back, {myData.name.split(' ')[0]}! </h1>
+          <h1 className="text-2xl font-bold text-slate-800">Welcome back, Earn Hui! </h1>
           <p className="text-slate-500 mt-1">Here is the latest progress on your Final Year Project.</p>
         </div>
         <button onClick={() => navigate('/student/consultations')} className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 shadow-sm transition-transform active:scale-95 flex items-center">
@@ -21,7 +21,8 @@ export default function StudentDashboard() {
           Book Consultation
         </button>
       </div>
-      
+
+      {/* Main Overview Card */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -38,11 +39,15 @@ export default function StudentDashboard() {
             <span className="text-indigo-600">{myData.progress}%</span>
           </div>
           <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-            <div className="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000 ease-out" style={{ width: `${myData.progress}%` }}></div>
+            <div 
+              className="bg-indigo-600 h-2.5 rounded-full transition-all duration-1000 ease-out" 
+              style={{ width: `${fypData.progress}%` }}
+            ></div>
           </div>
         </div>
       </div>
-      
+
+      {/* Two Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <div className="flex justify-between items-center mb-6">
@@ -60,13 +65,45 @@ export default function StudentDashboard() {
                 <h4 className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors">System Design Specification (SDS)</h4>
                 <p className="text-xs text-slate-500 mt-1">Due soon. Click to submit deliverable.</p>
               </div>
+              <div className="ml-4 flex flex-col items-end justify-center">
+                <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md">In Progress</span>
+              </div>
+            </div>
+
+            {/* Milestone 2 (Upcoming) */}
+            <div 
+              onClick={() => navigate('/student/milestones')}
+              className="flex p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:border-indigo-200 hover:shadow-sm transition-all group cursor-pointer"
+            >
+              <div className="h-12 w-12 rounded-lg bg-white border border-slate-200 flex flex-col items-center justify-center flex-shrink-0 group-hover:border-indigo-300 transition-colors">
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Dec</span>
+                <span className="text-lg font-black text-slate-700 leading-none">01</span>
+              </div>
+              <div className="ml-4 flex-1">
+                <h4 className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Final Implementation</h4>
+                <p className="text-xs text-slate-500 mt-1">Fully working prototype with UAT results.</p>
+              </div>
+              <div className="ml-4 flex flex-col items-end justify-center">
+                <span className="px-2.5 py-1 bg-slate-200 text-slate-600 text-xs font-bold rounded-md">Upcoming</span>
+              </div>
             </div>
           </div>
         </div>
-        
+
+        {/* Recent Activity / Action Needed */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">Recent Activity</h3>
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Recent Feedback</h3>
+          
           <div className="space-y-5 flex-1">
+            <div className="relative pl-4 border-l-2 border-indigo-200 cursor-pointer hover:bg-slate-50 p-2 rounded-r-lg transition-colors" onClick={() => navigate('/student/proposal')}>
+              <div className="absolute w-2 h-2 bg-indigo-600 rounded-full -left-[5px] top-1.5"></div>
+              <p className="text-xs font-medium text-slate-400 mb-1">Oct 16, 2026</p>
+              <h4 className="text-sm font-semibold text-slate-800">Project Proposal (Milestone 1)</h4>
+              <p className="text-sm text-slate-600 mt-1 bg-white p-3 rounded-lg border border-slate-100 italic shadow-sm">
+                "The project idea is relevant and objectives are clear. Continue with detailed system design. Approved."
+              </p>
+            </div>
+
             <div className="relative pl-4 border-l-2 border-emerald-200">
               <div className="absolute w-2 h-2 bg-emerald-500 rounded-full -left-[5px] top-1.5"></div>
               <p className="text-xs font-medium text-slate-400 mb-1">Supervisor assigned</p>
