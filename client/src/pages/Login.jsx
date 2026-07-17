@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Compass, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 export default function Login() {
@@ -9,30 +9,24 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Navigates exactly to the selected role's route (e.g., "/examiner")
     navigate(`/${role}`);
   };
 
   return (
     <div className="flex min-h-screen bg-slate-50 relative overflow-hidden">
-      {/* Left Panel - Dynamic Video Background (Hidden on Mobile) */}
+      {/* Left Panel - Dynamic Video Background */}
       <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 text-white overflow-hidden shadow-2xl">
-        
-        {/* Abstract Looping Tech Video */}
         <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className="absolute inset-0 w-full h-full object-cover z-0"
+           autoPlay 
+           loop 
+           muted 
+           playsInline 
+           className="absolute inset-0 w-full h-full object-cover z-0"
         >
           <source src="https://cdn.pixabay.com/video/2020/05/25/40134-424785663_large.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
         </video>
         
-        {/* Gradient Overlay for Text Readability */}
         <div className="absolute inset-0 bg-indigo-900/70 bg-gradient-to-b from-indigo-900/50 to-indigo-900/95 z-0"></div>
-
         <div className="relative z-10 flex items-center space-x-3">
           <Compass className="h-10 w-10 text-blue-400 animate-pulse" />
           <span className="text-3xl font-bold tracking-tight">FYPCompass</span>
@@ -96,7 +90,8 @@ export default function Login() {
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-sm font-medium text-slate-700">Password</label>
-                <a href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">Forgot password?</a>
+                {/* FIX: Prevent page jump on # href */}
+                <a href="#" onClick={(e) => { e.preventDefault(); alert("Please contact IT support to reset your password."); }} className="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">Forgot password?</a>
               </div>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600">
@@ -105,7 +100,7 @@ export default function Login() {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required 
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
                 />
                 <button 
@@ -124,6 +119,13 @@ export default function Login() {
             >
               Sign In <ArrowRight className="ml-2 h-4 w-4" />
             </button>
+            
+            <div className="mt-6 text-center text-sm text-slate-500">
+              Don't have an account?{" "}
+              <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
+                Sign up here
+              </Link>
+            </div>
           </form>
         </div>
       </div>

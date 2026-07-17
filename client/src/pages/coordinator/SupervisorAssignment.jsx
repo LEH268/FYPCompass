@@ -1,37 +1,41 @@
 import { useState } from "react";
-import { Users, UserPlus, AlertCircle, Search, CheckCircle } from "lucide-react";
+import { UserPlus, AlertCircle, Search, CheckCircle } from "lucide-react";
 
 export default function SupervisorAssignment() {
   const [assignmentSuccess, setAssignmentSuccess] = useState(false);
-
-  // Mock data for unassigned students
+  
   const [unassignedStudents, setUnassignedStudents] = useState([
     { id: "25011922", name: "Tan Ah Meng", topic: "Blockchain in Supply Chain", gpa: 3.4 },
     { id: "24998123", name: "Siti Nurhaliza", topic: "AR for Education", gpa: 3.8 },
     { id: "25881029", name: "Rajesh Kumar", topic: "Cybersecurity Threat Detection", gpa: 3.2 }
   ]);
 
-  // Mock data for faculty capacity
-  const faculty = [
+  const [faculty, setFaculty] = useState([
     { id: "F01", name: "Dr. Alan Turing", expertise: "AI, Machine Learning", currentLoad: 5, maxLoad: 8 },
     { id: "F02", name: "Dr. Siti Aminah", expertise: "Blockchain, Fintech", currentLoad: 8, maxLoad: 8 },
     { id: "F03", name: "Prof. John Smith", expertise: "Cybersecurity, Networking", currentLoad: 2, maxLoad: 6 },
-  ];
+  ]);
 
-  const handleAssign = (studentId) => {
-    // Simulate assigning a student
-    setUnassignedStudents(unassignedStudents.filter(s => s.id !== studentId));
+  const handleAssign = (facultyId) => {
+    if (unassignedStudents.length === 0) return;
+    const studentToAssign = unassignedStudents[0]; // Auto pick the first one
+
+    // Update students list
+    setUnassignedStudents(prev => prev.filter(s => s.id !== studentToAssign.id));
+    
+    // Update faculty load
+    setFaculty(prev => prev.map(f => f.id === facultyId ? { ...f, currentLoad: f.currentLoad + 1 } : f));
+    
     setAssignmentSuccess(true);
     setTimeout(() => setAssignmentSuccess(false), 3000);
   };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 relative">
-      {/* Toast Notification */}
       {assignmentSuccess && (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center z-50 animate-in slide-in-from-top-5 duration-300">
           <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
-          <span className="text-sm font-semibold">Student successfully assigned to supervisor.</span>
+          <span className="text-sm font-semibold">Student successfully assigned. Workload updated.</span>
         </div>
       )}
 
@@ -41,17 +45,14 @@ export default function SupervisorAssignment() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Left Column: Unassigned Students */}
         <div className="lg:col-span-1 space-y-4">
           <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex items-start shadow-sm">
             <AlertCircle className="w-5 h-5 text-rose-500 mt-0.5 mr-3 flex-shrink-0" />
             <div>
               <h3 className="text-sm font-bold text-rose-800">Action Required</h3>
-              <p className="text-xs text-rose-600 mt-1">There are {unassignedStudents.length} students awaiting supervisor assignment for the upcoming semester.</p>
+              <p className="text-xs text-rose-600 mt-1">There are {unassignedStudents.length} students awaiting assignment.</p>
             </div>
           </div>
-
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
               <h3 className="font-bold text-slate-800">Pending Students</h3>
@@ -61,14 +62,14 @@ export default function SupervisorAssignment() {
                 <div className="p-8 text-center text-slate-500 text-sm">All students have been assigned!</div>
               ) : (
                 unassignedStudents.map((student) => (
-                  <div key={student.id} className="p-4 hover:bg-slate-50 transition-colors">
+                  <div key={student.id} className="p-4 bg-white border-l-4 border-indigo-500">
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-bold text-slate-800 text-sm">{student.name}</span>
                       <span className="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">CGPA: {student.gpa}</span>
                     </div>
                     <p className="text-xs text-slate-500 mb-2">ID: {student.id}</p>
                     <p className="text-xs font-medium text-slate-700 bg-indigo-50 text-indigo-700 p-2 rounded border border-indigo-100">
-                      Proposed Topic: {student.topic}
+                      Proposed: {student.topic}
                     </p>
                   </div>
                 ))
@@ -77,71 +78,41 @@ export default function SupervisorAssignment() {
           </div>
         </div>
 
-        {/* Right Column: Faculty Capacity */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 className="text-lg font-bold text-slate-800">Faculty Capacity Dashboard</h3>
             <div className="relative w-full sm:w-64">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="Search faculty or expertise..." 
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 outline-none transition-all"
-              />
+              <input type="text" placeholder="Search faculty..." className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none" />
             </div>
           </div>
-
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
             {faculty.map((member) => {
               const capacityPercentage = (member.currentLoad / member.maxLoad) * 100;
               const isFull = member.currentLoad >= member.maxLoad;
               
               return (
-                <div key={member.id} className={`p-5 rounded-xl border transition-all ${
-                  isFull ? 'border-rose-100 bg-rose-50/30' : 'border-slate-200 hover:border-indigo-300 hover:shadow-md'
-                }`}>
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 font-bold text-sm ${
-                        isFull ? 'bg-rose-100 text-rose-700' : 'bg-indigo-100 text-indigo-700'
-                      }`}>
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-slate-800">{member.name}</h4>
-                        <p className="text-xs text-slate-500 truncate max-w-[150px]">{member.expertise}</p>
-                      </div>
+                <div key={member.id} className={`p-5 rounded-xl border transition-all ${isFull ? 'border-rose-100 bg-rose-50/30' : 'border-slate-200 hover:border-indigo-300'}`}>
+                  <div className="flex items-center mb-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 font-bold text-sm ${isFull ? 'bg-rose-100 text-rose-700' : 'bg-indigo-100 text-indigo-700'}`}>
+                      {member.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-800">{member.name}</h4>
+                      <p className="text-xs text-slate-500 truncate max-w-[150px]">{member.expertise}</p>
                     </div>
                   </div>
-
                   <div className="mb-4">
                     <div className="flex justify-between text-xs font-semibold mb-1.5">
                       <span className="text-slate-600">Current Load</span>
-                      <span className={isFull ? 'text-rose-600 font-bold' : 'text-slate-800'}>
-                        {member.currentLoad} / {member.maxLoad} Students
-                      </span>
+                      <span className={isFull ? 'text-rose-600 font-bold' : 'text-slate-800'}>{member.currentLoad} / {member.maxLoad} Students</span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full transition-all duration-1000 ${
-                          isFull ? 'bg-rose-500' : capacityPercentage > 75 ? 'bg-amber-500' : 'bg-emerald-500'
-                        }`} 
-                        style={{ width: `${capacityPercentage}%` }}
-                      ></div>
+                      <div className={`h-full rounded-full transition-all duration-500 ${isFull ? 'bg-rose-500' : capacityPercentage > 75 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${capacityPercentage}%` }}></div>
                     </div>
                   </div>
-
-                  <button 
-                    onClick={() => handleAssign(unassignedStudents[0]?.id)}
-                    disabled={isFull || unassignedStudents.length === 0}
-                    className={`w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${
-                      isFull || unassignedStudents.length === 0
-                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
-                        : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200'
-                    }`}
-                  >
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    {isFull ? 'Capacity Full' : 'Assign Top Student'}
+                  <button onClick={() => handleAssign(member.id)} disabled={isFull || unassignedStudents.length === 0} className={`w-full py-2 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${isFull || unassignedStudents.length === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200'}`}>
+                    <UserPlus className="w-4 h-4 mr-2" /> {isFull ? 'Capacity Full' : 'Assign Top Student'}
                   </button>
                 </div>
               );

@@ -50,6 +50,12 @@ export default function ProposalSubmission() {
     }, 1500);
   };
 
+  // FIX: Reset both the screen and the file attachment
+  const handleSubmitAnother = () => {
+    setFile(null);
+    setSubmitted(false);
+  };
+
   if (submitted) {
     return (
       <div className="flex flex-col items-center justify-center py-20 animate-in zoom-in duration-500">
@@ -62,7 +68,7 @@ export default function ProposalSubmission() {
         </p>
         <div className="flex gap-4">
           <button 
-            onClick={() => setSubmitted(false)}
+            onClick={handleSubmitAnother}
             className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
           >
             Submit Another File
