@@ -4,7 +4,7 @@ import Navbar from "./Navbar";
 
 export default function MainLayout({ role }) {
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-academic-pattern overflow-hidden font-sans">
       <Sidebar role={role} />
       <div className="flex flex-col flex-1 w-full min-w-0">
         <Navbar role={role} />

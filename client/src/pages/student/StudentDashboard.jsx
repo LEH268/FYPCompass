@@ -1,24 +1,30 @@
-// src/pages/student/StudentDashboard.jsx
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, CalendarCheck, FileText, CheckCircle } from "lucide-react";
+import { ChevronRight, CalendarCheck, FileText, CheckCircle, BookOpen } from "lucide-react";
 import { useData } from "../../context/DataContext";
+import profileImage from "../../assets/profile.png";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const { students, submissions, consultations } = useData();
-  
+
   // Mock logged-in student: Oliver Smith
   const myData = students.find(s => s.id === "25001001");
   const mySubmissions = submissions.filter(sub => sub.studentId === "25001001").sort((a,b) => b.id - a.id);
   const myConsultations = consultations.filter(c => c.studentId === "25001001");
-
   const recentFeedback = mySubmissions.find(sub => sub.feedback !== null);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Welcome back, {myData.name.split(' ')[0]}!</h1>
+          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+            Welcome back, {myData.name.split(' ')[0]}!
+            <img 
+              src={profileImage} 
+              alt="Studying" 
+              className="w-8 h-8 rounded-full mix-blend-multiply opacity-80"
+            />
+          </h1>
           <p className="text-slate-500 mt-1">Here is the latest progress on your Final Year Project.</p>
         </div>
         <button onClick={() => navigate('/student/consultations')} className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 shadow-sm transition-transform active:scale-95 flex items-center">
@@ -27,6 +33,24 @@ export default function StudentDashboard() {
         </button>
       </div>
       
+      {/* FYP Academic Banner */}
+      <div className="relative w-full h-40 md:h-48 rounded-2xl overflow-hidden shadow-sm border border-slate-200 group">
+        <div 
+          className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=2000&auto=format&fit=crop')" }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent"></div>
+        <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center">
+          <BookOpen className="h-8 w-8 text-amber-400 mb-3 animate-pulse" />
+          <h2 className="text-white text-xl md:text-2xl font-bold max-w-lg leading-tight drop-shadow-md">
+            "Research is creating new knowledge."
+          </h2>
+          <p className="text-indigo-100 text-sm mt-2 max-w-md drop-shadow-sm">
+            Stay consistent with your milestones. Every draft brings you closer to graduation.
+          </p>
+        </div>
+      </div>
+
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -92,7 +116,7 @@ export default function StudentDashboard() {
               <p className="text-sm text-slate-500 italic">No feedback received yet.</p>
             )}
           </div>
-          <button onClick={() => navigate('/student/consultations')} className="w-full mt-6 py-2 flex items-center justify-center text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
+          <button onClick={() => navigate('/student/consultations')} className="w-full mt-6 py-2 flex items-center justify-center text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-100">
             {myConsultations.length} Consultations Logged <ChevronRight className="h-4 w-4 ml-1" />
           </button>
         </div>

@@ -1,7 +1,7 @@
 // src/pages/coordinator/CoordinatorSupervisors.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ChevronRight } from "lucide-react";
+import { Search, ChevronRight, BookOpen } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function CoordinatorSupervisors() {
@@ -9,9 +9,10 @@ export default function CoordinatorSupervisors() {
   const { faculty } = useData();
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Fix: Add optional chaining to prevent undefined crashes (White Screen fix)
   const filteredFaculty = faculty.filter(fac => 
-    fac.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    fac.expertise.toLowerCase().includes(searchQuery.toLowerCase())
+    fac.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    fac.expertise?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -33,6 +34,24 @@ export default function CoordinatorSupervisors() {
         </div>
       </div>
 
+      {/* Coordinator Academic Banner */}
+      <div className="relative w-full h-40 md:h-48 rounded-2xl overflow-hidden shadow-sm border border-slate-200 group">
+        <div 
+          className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=2000&auto=format&fit=crop')" }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/60 to-transparent"></div>
+        <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-center">
+          <BookOpen className="h-8 w-8 text-emerald-400 mb-3 animate-pulse" />
+          <h2 className="text-white text-xl md:text-2xl font-bold max-w-lg leading-tight drop-shadow-md">
+            "Managing progress, shaping success."
+          </h2>
+          <p className="text-emerald-100 text-sm mt-2 max-w-md drop-shadow-sm">
+            Monitor projects, coordinate evaluations, and ensure smooth FYP operations.
+          </p>
+        </div>
+      </div>
+
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -46,12 +65,12 @@ export default function CoordinatorSupervisors() {
           <tbody className="text-sm divide-y divide-slate-100">
             {filteredFaculty.length === 0 ? (
               <tr>
-                <td colSpan="4" className="p-8 text-center text-slate-500">No faculty members found.</td>
+                <td colSpan="4" className="p-8 text-center text-slate-500 font-medium">No faculty members found.</td>
               </tr>
             ) : filteredFaculty.map(fac => (
               <tr key={fac.id} onClick={() => navigate(`/coordinator/supervisors/${fac.id}`)} className="hover:bg-slate-50/50 transition-colors cursor-pointer group">
                 <td className="p-4 pl-5">
-                  <div className="font-bold text-slate-800 group-hover:text-indigo-600">{fac.name}</div>
+                  <div className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{fac.name}</div>
                   <div className="text-xs text-slate-500">{fac.id}</div>
                 </td>
                 <td className="p-4 text-slate-600 font-medium">{fac.expertise}</td>
@@ -63,7 +82,7 @@ export default function CoordinatorSupervisors() {
                   </div>
                 </td>
                 <td className="p-4 text-right pr-5">
-                  <button className="text-indigo-600 font-semibold hover:underline text-xs flex items-center justify-end w-full">
+                  <button className="text-indigo-600 font-bold hover:underline text-xs flex items-center justify-end w-full">
                     View Profile <ChevronRight className="w-4 h-4 ml-1"/>
                   </button>
                 </td>

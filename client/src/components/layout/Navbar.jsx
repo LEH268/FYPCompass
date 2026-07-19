@@ -1,7 +1,7 @@
 // src/components/layout/Navbar.jsx
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Search, Menu, ChevronDown, LogOut, Settings, User, Check, CheckCircle2 } from "lucide-react";
+import { Bell, Search, Menu, ChevronDown, LogOut, User, Check, CheckCircle2 } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function Navbar({ role }) {
@@ -52,14 +52,15 @@ export default function Navbar({ role }) {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 sticky top-0">
-      <button className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg mr-2">
+    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 sticky top-0 shadow-sm">
+      <button className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg mr-2 transition-colors">
         <Menu className="h-5 w-5" />
       </button>
+
       <div className="flex-1 flex items-center">
         <div className="hidden md:flex items-center bg-slate-100/80 hover:bg-slate-100 border border-transparent focus-within:border-indigo-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-500/10 rounded-xl px-3 py-2 w-96 transition-all duration-200">
           <Search className="h-4 w-4 text-slate-400" />
-          <input type="text" placeholder="Search projects, students, or files..." className="bg-transparent border-none outline-none ml-2 w-full text-sm placeholder-slate-400 text-slate-700" />
+          <input type="text" placeholder="Search projects, students, or files..." className="bg-transparent border-none outline-none ml-2 w-full text-sm placeholder-slate-400 text-slate-700 font-medium" />
         </div>
       </div>
       
@@ -79,13 +80,13 @@ export default function Navbar({ role }) {
           </button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-100 rounded-xl shadow-xl overflow-hidden animate-in slide-in-from-top-2 duration-200 z-50">
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in slide-in-from-top-2 duration-200 z-50">
               <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                 <p className="text-sm font-bold text-slate-800">Notifications</p>
                 {unreadCount > 0 && (
                   <button 
                     onClick={() => markAllNotificationsAsRead(user.id)} 
-                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
                   >
                     Mark all as read
                   </button>
@@ -95,15 +96,15 @@ export default function Navbar({ role }) {
                 {userNotifications.length === 0 ? (
                   <div className="p-6 text-center flex flex-col items-center">
                     <CheckCircle2 className="h-8 w-8 text-slate-300 mb-2" />
-                    <p className="text-sm text-slate-500">You're all caught up!</p>
+                    <p className="text-sm text-slate-500 font-medium">You're all caught up!</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-50">
                     {userNotifications.map(n => (
                       <div key={n.id} className={`p-4 transition-colors flex items-start justify-between gap-3 ${!n.read ? 'bg-indigo-50/30' : 'hover:bg-slate-50'}`}>
                         <div className="flex-1">
-                          <p className={`text-sm ${!n.read ? 'font-semibold text-slate-800' : 'text-slate-600'}`}>{n.message}</p>
-                          <p className="text-xs text-slate-400 mt-1.5">{n.date}</p>
+                          <p className={`text-sm ${!n.read ? 'font-bold text-slate-800' : 'font-medium text-slate-600'}`}>{n.message}</p>
+                          <p className="text-xs text-slate-400 mt-1.5 font-medium">{n.date}</p>
                         </div>
                         {!n.read && (
                           <button 
@@ -120,7 +121,7 @@ export default function Navbar({ role }) {
                 )}
               </div>
               <div className="p-3 border-t border-slate-100 text-center bg-slate-50/50">
-                <button className="text-xs font-semibold text-slate-600 hover:text-indigo-600 transition-colors">
+                <button className="text-xs font-bold text-slate-600 hover:text-indigo-600 transition-colors">
                   View all notifications
                 </button>
               </div>
@@ -133,31 +134,29 @@ export default function Navbar({ role }) {
         {/* User Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <div onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition-colors">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold text-sm shadow-sm mr-2 lg:mr-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center font-bold text-sm shadow-sm mr-2 lg:mr-3 border border-indigo-200">
               {user.avatar}
             </div>
             <div className="flex-col hidden lg:flex">
-              <span className="text-sm font-semibold text-slate-800 leading-tight">{user.name}</span>
-              <span className="text-[11px] font-medium text-slate-500 leading-tight">{user.subtitle}</span>
+              <span className="text-sm font-bold text-slate-800 leading-tight">{user.name}</span>
+              <span className="text-[11px] font-bold text-slate-500 leading-tight uppercase tracking-wider">{user.subtitle}</span>
             </div>
             <ChevronDown className="h-4 w-4 text-slate-400 ml-2 hidden lg:block" />
           </div>
+
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-xl shadow-xl overflow-hidden animate-in slide-in-from-top-2 duration-200 z-50">
+            <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in slide-in-from-top-2 duration-200 z-50">
               <div className="p-4 border-b border-slate-100 bg-slate-50/50">
                 <p className="text-sm font-bold text-slate-800">{user.name}</p>
-                <p className="text-xs text-slate-500">{user.subtitle}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{user.subtitle}</p>
               </div>
               <div className="p-2 space-y-1">
-                <button onClick={() => setDropdownOpen(false)} className="w-full flex items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
+                <button onClick={() => setDropdownOpen(false)} className="w-full flex items-center px-3 py-2 text-sm font-bold text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
                   <User className="h-4 w-4 mr-3 text-slate-400" /> My Profile
-                </button>
-                <button onClick={() => setDropdownOpen(false)} className="w-full flex items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
-                  <Settings className="h-4 w-4 mr-3 text-slate-400" /> Settings
                 </button>
               </div>
               <div className="p-2 border-t border-slate-100">
-                <button onClick={handleLogout} className="w-full flex items-center px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-50 transition-colors">
+                <button onClick={handleLogout} className="w-full flex items-center px-3 py-2 text-sm font-bold text-rose-600 rounded-lg hover:bg-rose-50 transition-colors">
                   <LogOut className="h-4 w-4 mr-3" /> Sign out
                 </button>
               </div>

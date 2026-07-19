@@ -1,10 +1,8 @@
 // src/components/layout/Sidebar.jsx
-import { NavLink, useNavigate } from "react-router-dom";
-import { Compass, LayoutDashboard, Flag, FileUp, Users, MessageSquare, Settings, LogOut, ClipboardCheck, UserCog } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import { GraduationCap, LayoutDashboard, Flag, FileUp, Users, MessageSquare, LogOut, ClipboardCheck, UserCog } from "lucide-react";
 
 export default function Sidebar({ role }) {
-  const navigate = useNavigate();
-
   const getNavLinks = () => {
     switch (role) {
       case "student":
@@ -20,7 +18,6 @@ export default function Sidebar({ role }) {
           { name: "My Students", path: "/supervisor/students", icon: Users },
           { name: "Feedback", path: "/supervisor/feedback", icon: MessageSquare },
           { name: "Meetings", path: "/supervisor/consultations", icon: Users },
-          { name: "Settings", path: "/supervisor/settings", icon: Settings }, // <--- ADDED to main menu
         ];
       case "examiner":
         return [
@@ -40,24 +37,16 @@ export default function Sidebar({ role }) {
 
   const links = getNavLinks();
 
-  const handleSettingsClick = () => {
-    if (role === "supervisor") {
-      navigate("/supervisor/settings");
-    } else {
-      alert("Settings module is under construction for this role.");
-    }
-  };
-
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0">
-      <div className="h-16 flex items-center px-6 border-b border-slate-100">
-        <Compass className="h-7 w-7 text-indigo-600 mr-2" />
-        <span className="text-xl font-bold text-slate-800">FYPCompass</span>
+    <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0 shadow-sm z-20">
+      <div className="h-16 flex items-center px-6 border-b border-slate-100 bg-slate-900 text-white">
+        <GraduationCap className="h-7 w-7 text-amber-400 mr-2" />
+        <span className="text-xl font-bold tracking-wide">FYPCompass</span>
       </div>
       
       <div className="flex-1 overflow-y-auto py-6 px-4">
-        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-2">
-          Menu
+        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">
+          Academic Menu
         </div>
         <nav className="space-y-1">
           {links.map((link) => (
@@ -66,10 +55,10 @@ export default function Sidebar({ role }) {
               to={link.path}
               end={link.path === `/${role}`}
               className={({ isActive }) =>
-                `flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                `flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-indigo-50 text-indigo-600"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    ? "bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600 shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-l-4 border-transparent"
                 }`
               }
             >
@@ -80,11 +69,8 @@ export default function Sidebar({ role }) {
         </nav>
       </div>
       
-      <div className="p-4 border-t border-slate-100 space-y-1">
-        <button onClick={handleSettingsClick} className="flex w-full items-center px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors">
-          <Settings className="h-5 w-5 mr-3" /> System Settings
-        </button>
-        <NavLink to="/login" className="flex w-full items-center px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-50 transition-colors">
+      <div className="p-4 border-t border-slate-100 space-y-1 bg-slate-50">
+        <NavLink to="/login" className="flex w-full items-center px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-100 transition-colors">
           <LogOut className="h-5 w-5 mr-3" /> Logout
         </NavLink>
       </div>
