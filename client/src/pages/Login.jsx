@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import bgGif from "../assets/Login and Signup Background.gif";
-import cartoonGif from "../assets/cartoon.gif";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +29,6 @@ export default function Login() {
           <span className="text-3xl font-bold tracking-tight">FYPCompass</span>
         </div>
         
-        <img src={cartoonGif} alt="Cartoon" className="w-80 h-80 mb-1 mx-auto object-contain drop-shadow-lg translate-y-12"/>
         <div className="relative z-10 max-w-lg mt-20">
           <h1 className="text-4xl font-bold leading-tight mb-6 drop-shadow-lg">Streamline Your Final Year Project Journey.</h1>
           <p className="text-white/90 text-lg leading-relaxed drop-shadow-md">
