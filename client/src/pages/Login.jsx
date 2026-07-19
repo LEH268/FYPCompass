@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
-import bgGif from "../assets/Login_and_Signup_Left_Panel_GIF_transparent.gif";
+import bgGif from "../assets/Login and Signup Background.gif";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
