@@ -39,8 +39,8 @@ export default function Sidebar({ role }) {
 
   return (
     <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0 shadow-sm z-20">
-      <div className="h-16 flex items-center px-6 border-b border-slate-100 bg-slate-900 text-white">
-        <GraduationCap className="h-7 w-7 text-amber-400 mr-2" />
+      <div className="h-16 flex items-center px-6 border-b border-blue-800 bg-blue-900 text-white">
+        <GraduationCap className="h-7 w-7 text-yellow-400 mr-2" />
         <span className="text-xl font-bold tracking-wide">FYPCompass</span>
       </div>
       

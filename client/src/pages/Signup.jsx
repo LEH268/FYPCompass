@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, Mail, Lock, Eye, EyeOff, ArrowRight, User, Hash } from "lucide-react";
 import bgGif from "../assets/Login and Signup Background.gif";
+import cartoonGif from "../assets/cartoon.gif";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,13 +21,15 @@ export default function Signup() {
       <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 text-white overflow-hidden shadow-2xl">
         <div 
           className="absolute inset-0 w-full h-full object-cover z-0"
-          style={{ backgroundImage: `url(${bgGif})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+          style={{ backgroundImage: `url(${bgGif})`, backgroundSize: "160%", backgroundPosition: 'center' }}
         ></div>
         <div className="absolute inset-0 bg-indigo-900/60 backdrop-blur-[2px] z-0"></div>
         <div className="relative z-10 flex items-center space-x-3">
           <GraduationCap className="h-10 w-10 text-white animate-pulse" />
           <span className="text-3xl font-bold tracking-tight">FYPCompass</span>
         </div>
+
+        <img src={cartoonGif} alt="Cartoon" className="w-80 h-80 mb-1 mx-auto object-contain drop-shadow-lg translate-y-12"/>
         <div className="relative z-10 max-w-lg mt-20">
           <h1 className="text-4xl font-bold leading-tight mb-6 drop-shadow-lg">Begin Your Final Year Project Journey.</h1>
           <p className="text-white/90 text-lg leading-relaxed drop-shadow-md">
