@@ -52,7 +52,7 @@ export default function Navbar({ role }) {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 sticky top-0 shadow-sm">
+    <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 shrink-0 z-10 sticky top-0 shadow-sm">
       <button className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg mr-2 transition-colors">
         <Menu className="h-5 w-5" />
       </button>
