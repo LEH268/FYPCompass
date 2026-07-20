@@ -41,7 +41,7 @@ export default function Signup() {
       </div>
       
       {/* Right Panel - Signup Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 z-10 bg-academic-pattern backdrop-blur-md overflow-y-auto">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 z-10 bg-white backdrop-blur-md overflow-y-auto">
         <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-200 transition-all hover:shadow-2xl my-8">
           <div className="flex items-center space-x-2 mb-8 lg:hidden">
             <GraduationCap className="h-8 w-8 text-indigo-700" />

@@ -6,7 +6,7 @@ import bgGif from "../assets/Login and Signup Background.gif";
 
 export default function Login() {
   const [showForgotModal, setShowForgotModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 已修复：添加了缺失的状态
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState(1);
@@ -132,6 +132,14 @@ export default function Login() {
             <button type="submit" className="w-full py-3 mt-6 text-sm font-bold rounded-lg text-white bg-indigo-700 hover:bg-indigo-800 transition-all">
               Sign In <ArrowRight className="ml-2 h-4 w-4 inline" />
             </button>
+
+            {/* Link to Signup Page */}
+            <div className="mt-6 text-center text-sm text-slate-500">
+              Don't have an account?{" "}
+              <Link to="/signup" className="font-bold text-indigo-700 hover:text-indigo-900 transition-colors">
+                Sign up here
+              </Link>
+            </div>
           </form>
 
           {/* Forgot Password Modal */}
@@ -146,7 +154,7 @@ export default function Login() {
                 ) : (
                   <input type="text" maxLength={6} placeholder="000000" value={otp} onChange={(e) => setOtp(e.target.value)} className="w-full border rounded-lg px-4 py-3 mb-3 text-center tracking-[8px] text-xl outline-none focus:ring-2 focus:ring-indigo-500" />
                 )}
-
+                
                 <button onClick={handleForgotSubmit} className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
                   {step === 1 ? "Send OTP" : "Verify OTP"}
                 </button>
