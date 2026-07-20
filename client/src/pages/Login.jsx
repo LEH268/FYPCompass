@@ -59,7 +59,7 @@ export default function Login() {
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 z-10 bg-academic-pattern backdrop-blur-md">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 z-10 bg-white backdrop-blur-md">
         <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-100 transition-all hover:shadow-2xl">
           <div className="flex items-center space-x-2 mb-8 lg:hidden">
             <GraduationCap className="h-8 w-8 text-indigo-700" />
