@@ -1,19 +1,21 @@
 // src/pages/student/MilestoneTimeline.jsx
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle, Clock, CircleDashed, ArrowRight, Eye } from "lucide-react";
+import { CheckCircle, Clock, CircleDashed, ArrowRight, Eye, Filter } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function MilestoneTimeline() {
   const navigate = useNavigate();
   const { submissions } = useData();
-  
+  const [statusFilter, setStatusFilter] = useState("All");
+
   // Get submissions for current student Oliver Smith
   const mySubmissions = submissions.filter(s => s.studentId === "25001001");
 
-  // Determine status strictly based on what is in the submissions database
   const getMilestoneStatus = (milestoneName) => {
     const sub = mySubmissions.find(s => s.milestone === milestoneName);
     if (!sub) return "Not Submitted";
+    if (sub.status === "Draft") return "Draft";
     if (sub.status === "Approved") return "Completed";
     return "Pending Review";
   };
@@ -56,36 +58,58 @@ export default function MilestoneTimeline() {
     }
   ];
 
+  const filteredMilestones = milestones.filter(m => statusFilter === "All" || m.status === statusFilter);
+
   const getStatusIcon = (status) => {
     switch(status) {
       case "Completed": return <CheckCircle className="text-emerald-500 bg-white rounded-full shadow-sm" size={28} />;
       case "Pending Review": return <Clock className="text-amber-500 bg-white rounded-full shadow-sm" size={28} />;
+      case "Draft": return <CircleDashed className="text-blue-400 bg-white rounded-full shadow-sm" size={28} />;
       default: return <CircleDashed className="text-slate-300 bg-white rounded-full" size={28} />;
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-800">Milestone Timeline</h1>
-        <p className="text-slate-500 mt-1">Track your project phases and upcoming submission deadlines.</p>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">Milestone Timeline</h1>
+          <p className="text-slate-500 mt-1">Track your project phases and upcoming submission deadlines.</p>
+        </div>
+        
+        <div className="relative w-full sm:w-48">
+          <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-600 outline-none shadow-sm transition-all appearance-none"
+          >
+            <option value="All">All Statuses</option>
+            <option value="Completed">Completed</option>
+            <option value="Pending Review">Pending Review</option>
+            <option value="Draft">Drafts</option>
+            <option value="Not Submitted">Not Submitted</option>
+          </select>
+        </div>
       </div>
       
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div className="relative border-l-2 border-slate-200 ml-4 space-y-8">
-          {milestones.map((milestone) => (
+          {filteredMilestones.length === 0 ? (
+            <p className="text-slate-500 font-bold ml-6">No milestones match this filter.</p>
+          ) : filteredMilestones.map((milestone) => (
             <div key={milestone.id} className="relative pl-8">
-              {/* Icon */}
               <div className="absolute -left-[15px] top-1">
                 {getStatusIcon(milestone.status)}
               </div>
               
-              {/* Content */}
               <div className={`p-5 rounded-xl border transition-all ${
                 milestone.status === 'Pending Review' 
                   ? 'border-amber-200 bg-amber-50/50 shadow-sm ring-1 ring-amber-500/10' 
                   : milestone.status === 'Completed'
                   ? 'border-emerald-100 bg-emerald-50/20'
+                  : milestone.status === 'Draft'
+                  ? 'border-blue-200 bg-blue-50/50'
                   : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'
               }`}>
                 <div className="flex justify-between items-start mb-2">
@@ -93,6 +117,7 @@ export default function MilestoneTimeline() {
                   <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold ${
                     milestone.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 
                     milestone.status === 'Pending Review' ? 'bg-amber-100 text-amber-700' : 
+                    milestone.status === 'Draft' ? 'bg-blue-100 text-blue-700' :
                     'bg-slate-200 text-slate-600'
                   }`}>
                     {milestone.status}
@@ -111,7 +136,7 @@ export default function MilestoneTimeline() {
                       onClick={() => navigate('/student/proposal')}
                       className="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center justify-center font-bold text-sm transition-colors shadow-sm w-full sm:w-auto"
                     >
-                      Submit Deliverable <ArrowRight className="w-4 h-4 ml-2" />
+                      Make Submission <ArrowRight className="w-4 h-4 ml-2" />
                     </button>
                   )}
                   {milestone.status !== "Not Submitted" && (
@@ -119,7 +144,7 @@ export default function MilestoneTimeline() {
                       onClick={() => navigate('/student/proposal')}
                       className="text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 px-4 py-2 rounded-lg flex items-center justify-center font-bold text-sm transition-colors w-full sm:w-auto shadow-sm"
                     >
-                      <Eye className="w-4 h-4 mr-2" /> View Status & Feedback
+                      <Eye className="w-4 h-4 mr-2" /> View Status & File
                     </button>
                   )}
                 </div>
