@@ -17,6 +17,7 @@ import StudentProgress from "./pages/supervisor/StudentProgress";
 import SupervisorStudentDetails from "./pages/supervisor/SupervisorStudentDetails";
 import FeedbackManagement from "./pages/supervisor/FeedbackManagement";
 import SupervisorConsultation from "./pages/supervisor/SupervisorConsultation";
+import SupervisorSettings from "./pages/supervisor/SupervisorSettings";
 
 // Coordinator Pages
 import CoordinatorDashboard from "./pages/coordinator/CoordinatorDashboard";
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="students/:id" element={<SupervisorStudentDetails />} />
             <Route path="feedback" element={<FeedbackManagement />} />
             <Route path="consultations" element={<SupervisorConsultation />} />
+            <Route path="settings" element={<SupervisorSettings />} />
           </Route>
 
           {/* ================= COORDINATOR ================= */}

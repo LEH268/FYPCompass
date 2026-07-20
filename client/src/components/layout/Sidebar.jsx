@@ -1,6 +1,6 @@
 // src/components/layout/Sidebar.jsx
 import { NavLink } from "react-router-dom";
-import { GraduationCap, LayoutDashboard, Flag, FileUp, Users, MessageSquare, LogOut, ClipboardCheck, UserCog } from "lucide-react";
+import { GraduationCap, LayoutDashboard, Flag, FileUp, Users, MessageSquare, LogOut, ClipboardCheck, UserCog, Settings } from "lucide-react";
 
 export default function Sidebar({ role }) {
   const getNavLinks = () => {
@@ -17,7 +17,8 @@ export default function Sidebar({ role }) {
           { name: "Dashboard", path: "/supervisor", icon: LayoutDashboard },
           { name: "My Students", path: "/supervisor/students", icon: Users },
           { name: "Feedback", path: "/supervisor/feedback", icon: MessageSquare },
-          { name: "Meetings", path: "/supervisor/consultations", icon: Users },
+          { name: "Consultation", path: "/supervisor/consultations", icon: Users },
+          { name: "Settings", path: "/supervisor/settings", icon: Settings },
         ];
       case "examiner":
         return [

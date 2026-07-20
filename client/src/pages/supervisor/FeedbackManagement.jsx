@@ -1,7 +1,7 @@
 // src/pages/supervisor/FeedbackManagement.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, CheckCircle, Save, ListChecks, MessageSquare, ChevronRight } from "lucide-react";
+import { FileText, CheckCircle, Save, ListChecks, MessageSquare, ChevronRight, Download } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function FeedbackManagement() {
@@ -17,7 +17,7 @@ export default function FeedbackManagement() {
     sub.status === "Pending Review" && myStudents.some(s => s.id === sub.studentId)
   );
 
-  const [selectedId, setSelectedId] = useState(null); // Explicitly start with no selection
+  const [selectedId, setSelectedId] = useState(null);
   const activeItem = pendingItems.find(item => item.id === selectedId);
 
   const handleSave = (e) => {
@@ -33,11 +33,16 @@ export default function FeedbackManagement() {
     }
   };
 
+  const handleDownload = () => {
+    // In a real app, this would trigger a file download from a backend URL
+    alert(`Downloading student file: ${activeItem?.file || 'submission.pdf'}`);
+  };
+
   if (isSaved) {
     return (
       <div className="flex flex-col items-center justify-center py-20 animate-in zoom-in duration-300">
         <CheckCircle className="w-20 h-20 text-emerald-500 mb-4" />
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Feedback Submitted</h2>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">Feedback & Comments Submitted</h2>
         <p className="text-slate-500">The student has been notified and progress has been updated.</p>
       </div>
     );
@@ -46,8 +51,8 @@ export default function FeedbackManagement() {
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Provide Feedback</h1>
-        <p className="text-slate-500 text-sm mt-1">Select a pending deliverable from the queue to evaluate.</p>
+        <h1 className="text-2xl font-bold text-slate-800">Provide Feedback & Comments</h1>
+        <p className="text-slate-500 text-sm mt-1">Select a pending deliverable from the queue to evaluate and leave comments.</p>
       </div>
       
       {pendingItems.length === 0 ? (
@@ -87,7 +92,7 @@ export default function FeedbackManagement() {
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-10 text-center flex flex-col items-center justify-center h-full">
                 <FileText className="w-16 h-16 text-slate-200 mb-4" />
                 <h3 className="text-lg font-bold text-slate-600">Select a submission</h3>
-                <p className="text-sm text-slate-400 mt-1">Choose a student's work from the queue to start evaluating.</p>
+                <p className="text-sm text-slate-400 mt-1">Choose a student's work from the queue to download and evaluate.</p>
               </div>
             ) : (
               <>
@@ -96,9 +101,12 @@ export default function FeedbackManagement() {
                     <h3 className="font-bold text-slate-800 text-lg">{activeItem.studentName}</h3>
                     <p className="text-sm text-slate-500 mt-1">Milestone: <span className="font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">{activeItem.milestone}</span></p>
                     <p className="text-sm text-slate-500 mt-2">Submitted: {activeItem.date}</p>
+                    <p className="text-sm font-semibold text-slate-700 mt-2 flex items-center">
+                      <FileText className="w-4 h-4 mr-1 text-slate-400"/> {activeItem.file || 'Document.pdf'}
+                    </p>
                   </div>
-                  <button className="flex items-center px-4 py-2 bg-indigo-50 text-indigo-700 font-bold text-sm rounded-lg hover:bg-indigo-100 transition-colors border border-indigo-200 shadow-sm w-full md:w-auto justify-center">
-                    <FileText className="w-4 h-4 mr-2"/> Download File
+                  <button onClick={handleDownload} className="flex items-center px-4 py-2 bg-indigo-600 text-white font-bold text-sm rounded-lg hover:bg-indigo-700 transition-colors shadow-sm w-full md:w-auto justify-center">
+                    <Download className="w-4 h-4 mr-2"/> Download File
                   </button>
                 </div>
 
@@ -106,7 +114,7 @@ export default function FeedbackManagement() {
                   <div className="bg-amber-50 rounded-2xl shadow-sm border border-amber-200 p-5 flex items-start gap-3 animate-in slide-in-from-right-4">
                     <MessageSquare className="w-5 h-5 text-amber-600 mt-0.5" />
                     <div>
-                      <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Student's Message</p>
+                      <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Student's Comment</p>
                       <p className="text-sm text-amber-900 italic leading-relaxed">"{activeItem.studentMessage}"</p>
                     </div>
                   </div>
@@ -114,8 +122,9 @@ export default function FeedbackManagement() {
 
                 <form onSubmit={handleSave} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col space-y-6 animate-in slide-in-from-right-4">
                   <div className="border-b border-slate-100 pb-4">
-                    <h3 className="font-bold text-slate-800 flex items-center"><Save className="w-5 h-5 mr-2 text-indigo-600"/> Official Evaluation</h3>
+                    <h3 className="font-bold text-slate-800 flex items-center"><Save className="w-5 h-5 mr-2 text-indigo-600"/> Official Evaluation & Comments</h3>
                   </div>
+
                   <div>
                     <label className="block text-sm font-bold text-slate-800 mb-2">Decision</label>
                     <div className="grid grid-cols-2 gap-3">
@@ -127,10 +136,12 @@ export default function FeedbackManagement() {
                       </button>
                     </div>
                   </div>
+
                   <div>
-                    <label className="block text-sm font-bold text-slate-800 mb-2">Supervisor Feedback</label>
-                    <textarea required value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows="5" placeholder="Provide specific feedback..." className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:border-indigo-600 resize-none text-sm"></textarea>
+                    <label className="block text-sm font-bold text-slate-800 mb-2">Comments for Student</label>
+                    <textarea required value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows="5" placeholder="Leave a comment or specific feedback for the student..." className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:border-indigo-600 resize-none text-sm"></textarea>
                   </div>
+
                   <div className="flex justify-end pt-2">
                     <button type="submit" className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow-md active:scale-95 transition-all">Submit Feedback</button>
                   </div>

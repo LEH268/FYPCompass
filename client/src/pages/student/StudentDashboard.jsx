@@ -1,5 +1,7 @@
+// src/pages/student/StudentDashboard.jsx
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, CalendarCheck, FileText, CheckCircle, BookOpen } from "lucide-react";
+import { ChevronRight, CalendarCheck, FileText, CheckCircle, BookOpen, MessageCircle, X, Send } from "lucide-react";
 import { useData } from "../../context/DataContext";
 import profileImage from "../../assets/profile.png";
 
@@ -7,14 +9,44 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
   const { students, submissions, consultations } = useData();
 
+  // Chat State
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const chatEndRef = useRef(null);
+
   // Mock logged-in student: Oliver Smith
   const myData = students.find(s => s.id === "25001001");
   const mySubmissions = submissions.filter(sub => sub.studentId === "25001001").sort((a,b) => b.id - a.id);
   const myConsultations = consultations.filter(c => c.studentId === "25001001");
   const recentFeedback = mySubmissions.find(sub => sub.feedback !== null);
 
+  // Mock Chat History
+  const [chatMessages, setChatMessages] = useState([
+    { id: 1, sender: "supervisor", text: `Hi ${myData.name.split(' ')[0]}, how is the progress on your upcoming deliverable?`, time: "Yesterday, 2:30 PM" },
+    { id: 2, sender: "me", text: "I'm currently finalizing the diagrams. I'll submit them soon.", time: "Yesterday, 3:15 PM" },
+    { id: 3, sender: "supervisor", text: "Great. Let me know if you need a quick consultation.", time: "Yesterday, 3:20 PM" }
+  ]);
+
+  // Auto-scroll to bottom of chat when new message is added
+  useEffect(() => {
+    if (isChatOpen) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, isChatOpen]);
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    
+    setChatMessages([
+      ...chatMessages, 
+      { id: Date.now(), sender: "me", text: chatInput, time: "Just now" }
+    ]);
+    setChatInput("");
+  };
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 relative pb-10">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
@@ -100,6 +132,7 @@ export default function StudentDashboard() {
           </div>
         </div>
         
+        {/* ORIGINAL LATEST FEEDBACK COMPONENT */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
           <h3 className="text-lg font-bold text-slate-800 mb-6">Latest Feedback</h3>
           <div className="space-y-5 flex-1">
@@ -120,6 +153,77 @@ export default function StudentDashboard() {
             {myConsultations.length} Consultations Logged <ChevronRight className="h-4 w-4 ml-1" />
           </button>
         </div>
+      </div>
+
+      {/* FLOATING CHAT WIDGET */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        {isChatOpen && (
+          <div className="bg-white w-80 sm:w-96 rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[400px] mb-4 animate-in slide-in-from-bottom-5">
+            {/* Chat Header */}
+            <div className="bg-indigo-600 p-4 text-white flex justify-between items-center shadow-md z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white text-indigo-600 flex items-center justify-center font-bold text-xs">
+                  {myData.supervisorName.split(' ').map(n=>n[0]).join('')}
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm leading-tight">{myData.supervisorName}</h3>
+                  <p className="text-[10px] text-indigo-200 font-medium">Supervisor • Online</p>
+                </div>
+              </div>
+              <button onClick={() => setIsChatOpen(false)} className="text-indigo-200 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Chat Messages */}
+            <div className="flex-1 p-4 overflow-y-auto bg-slate-50 space-y-4">
+              {chatMessages.map((msg) => (
+                <div key={msg.id} className={`flex flex-col ${msg.sender === 'me' ? 'items-end' : 'items-start'}`}>
+                  <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] text-sm shadow-sm ${
+                    msg.sender === 'me' 
+                      ? 'bg-indigo-600 text-white rounded-tr-sm' 
+                      : 'bg-white border border-slate-200 text-slate-700 rounded-tl-sm'
+                  }`}>
+                    {msg.text}
+                  </div>
+                  <span className="text-[9px] font-bold text-slate-400 mt-1 px-1">
+                    {msg.time}
+                  </span>
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+            
+            {/* Chat Input */}
+            <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+              <input 
+                type="text" 
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Type a message..." 
+                className="flex-1 bg-slate-100 border-none outline-none px-4 py-2.5 rounded-full text-sm font-medium focus:ring-2 focus:ring-indigo-500/50"
+              />
+              <button 
+                type="submit"
+                disabled={!chatInput.trim()}
+                className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 transition-colors shadow-sm flex-shrink-0"
+              >
+                <Send className="w-4 h-4 ml-0.5" />
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Circular Toggle Button */}
+        {!isChatOpen && (
+          <button 
+            onClick={() => setIsChatOpen(true)} 
+            className="w-14 h-14 bg-indigo-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 border-4 border-white relative"
+          >
+            <MessageCircle className="w-6 h-6" />
+            <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-rose-500 border-2 border-white rounded-full"></span>
+          </button>
+        )}
       </div>
     </div>
   );
