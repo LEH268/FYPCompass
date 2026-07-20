@@ -67,7 +67,7 @@ export default function Signup() {
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1.5">Full Name</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Username</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-600">
                   <User className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-600" />
