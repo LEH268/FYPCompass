@@ -1,7 +1,7 @@
 // src/pages/coordinator/CoordinatorDashboard.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, UserCog, AlertTriangle, Download, FileSpreadsheet, X, CheckCircle, BookOpen, ShieldCheck } from "lucide-react";
+import { Users, UserCog, AlertTriangle, Download, FileSpreadsheet, FileText, X, CheckCircle, BookOpen, ShieldCheck, Filter } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function CoordinatorDashboard() {
@@ -10,6 +10,12 @@ export default function CoordinatorDashboard() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
+  
+  // NEW: State for export format
+  const [exportFormat, setExportFormat] = useState("excel");
+  
+  // NEW: Filter for cohort table
+  const [tableFilter, setTableFilter] = useState("All");
 
   const totalStudents = students.length;
   const activeSupervisors = faculty.length;
@@ -35,6 +41,14 @@ export default function CoordinatorDashboard() {
       }, 2000);
     }, 1500);
   };
+
+  const filteredStudents = students.filter(s => {
+    if (tableFilter === "All") return true;
+    if (tableFilter === "At Risk") return s.status === "At Risk";
+    if (tableFilter === "Completed") return s.stage === "Completed";
+    if (tableFilter === "Postgrad Intent") return s.gpa >= 3.8; // Example dynamic filter
+    return true;
+  });
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 relative">
@@ -94,10 +108,28 @@ export default function CoordinatorDashboard() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50/50">
-          <h3 className="text-lg font-bold text-slate-800">Cohort Progress Tracking</h3>
-          <ShieldCheck className="text-indigo-600 w-5 h-5" />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-slate-100 bg-slate-50/50 gap-4">
+          <div className="flex items-center">
+            <ShieldCheck className="text-indigo-600 w-5 h-5 mr-2" />
+            <h3 className="text-lg font-bold text-slate-800">Cohort Progress Tracking</h3>
+          </div>
+          
+          {/* Add Filter Dropdown */}
+          <div className="relative w-full sm:w-48">
+            <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <select
+              value={tableFilter}
+              onChange={(e) => setTableFilter(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-600 outline-none shadow-sm transition-all appearance-none"
+            >
+              <option value="All">View All Students</option>
+              <option value="At Risk">At Risk Students</option>
+              <option value="Completed">Completed Phase</option>
+              <option value="Postgrad Intent">High Performers (GPA 3.8+)</option>
+            </select>
+          </div>
         </div>
+
         <div className="overflow-x-auto max-h-[500px]">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-slate-50 shadow-sm z-10">
@@ -109,7 +141,7 @@ export default function CoordinatorDashboard() {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-100">
-              {students.map((s) => (
+              {filteredStudents.map((s) => (
                 <tr key={s.id} onClick={() => navigate(`/coordinator/students/${s.id}`)} className="hover:bg-slate-50/50 transition-colors cursor-pointer group">
                   <td className="p-4 pl-5">
                     <div className="font-bold text-slate-800 group-hover:text-indigo-600">{s.name}</div>
@@ -151,7 +183,7 @@ export default function CoordinatorDashboard() {
               <div className="p-8 text-center flex flex-col items-center">
                 <CheckCircle className="w-16 h-16 text-emerald-500 mb-4" />
                 <h3 className="text-xl font-bold text-slate-800">Report Generated!</h3>
-                <p className="text-sm text-slate-500 mt-2 font-medium">The FYP Cohort Report has been downloaded to your device.</p>
+                <p className="text-sm text-slate-500 mt-2 font-medium">The FYP Cohort Report has been downloaded to your device as {exportFormat.toUpperCase()}.</p>
               </div>
             ) : (
               <>
@@ -164,18 +196,28 @@ export default function CoordinatorDashboard() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
+                
                 <div className="p-6 space-y-5">
                   <div>
                     <label className="text-sm font-bold text-slate-700 block mb-2">Report Format</label>
                     <div className="grid grid-cols-2 gap-3">
-                      <button className="flex items-center justify-center p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-700 text-sm font-bold shadow-sm">
+                      <button 
+                        onClick={() => setExportFormat("excel")}
+                        className={`flex items-center justify-center p-3 rounded-xl border-2 text-sm font-bold shadow-sm transition-colors ${exportFormat === "excel" ? "border-indigo-600 bg-indigo-50 text-indigo-700" : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}
+                      >
                         <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel
                       </button>
-                      <button className="p-3 rounded-xl border border-slate-300 text-slate-600 text-sm font-bold hover:bg-slate-50 shadow-sm transition-colors">
-                        PDF
+                      
+                      {/* PDF is now selectable and clickable */}
+                      <button 
+                        onClick={() => setExportFormat("pdf")}
+                        className={`flex items-center justify-center p-3 rounded-xl border-2 text-sm font-bold shadow-sm transition-colors ${exportFormat === "pdf" ? "border-indigo-600 bg-indigo-50 text-indigo-700" : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}
+                      >
+                        <FileText className="w-4 h-4 mr-2" /> PDF
                       </button>
                     </div>
                   </div>
+                  
                   <div>
                     <label className="text-sm font-bold text-slate-700 block mb-2">Data Inclusion</label>
                     <select className="w-full p-3 border border-slate-300 rounded-xl text-sm font-medium outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-white">
@@ -185,12 +227,13 @@ export default function CoordinatorDashboard() {
                     </select>
                   </div>
                 </div>
+                
                 <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
                   <button onClick={() => setShowExportModal(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-200 transition-colors">
                     Cancel
                   </button>
                   <button disabled={isExporting} onClick={handleExport} className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center shadow-md active:scale-95 transition-all">
-                    {isExporting ? 'Generating...' : 'Download Report'}
+                    {isExporting ? 'Generating...' : `Download ${exportFormat.toUpperCase()}`}
                   </button>
                 </div>
               </>

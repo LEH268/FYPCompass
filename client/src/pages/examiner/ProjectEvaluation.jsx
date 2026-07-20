@@ -1,5 +1,5 @@
 // src/pages/examiner/ProjectEvaluation.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save, CheckCircle, FileSignature, Clock } from "lucide-react";
 import { useData } from "../../context/DataContext";
@@ -7,12 +7,21 @@ import { useData } from "../../context/DataContext";
 export default function ProjectEvaluation() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { students } = useData();
+  const { students, evaluationDrafts, saveEvaluationDraft } = useData();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isDraftSaved, setIsDraftSaved] = useState(false);
+  
+  // NEW: Pre-load grades if a draft exists for this student in Context
   const [grades, setGrades] = useState({ presentation: "", technical: "", documentation: "" });
 
+  useEffect(() => {
+    if (evaluationDrafts[id]) {
+      setGrades(evaluationDrafts[id]);
+    }
+  }, [id, evaluationDrafts]);
+
   const student = students.find(s => s.id === id);
+
   const totalScore = (Number(grades.presentation) || 0) + (Number(grades.technical) || 0) + (Number(grades.documentation) || 0);
 
   const handleFinalize = (e) => {
@@ -23,6 +32,8 @@ export default function ProjectEvaluation() {
 
   const handleSaveDraft = (e) => {
     e.preventDefault();
+    // Use context to properly save and persist draft data
+    saveEvaluationDraft(id, grades);
     setIsDraftSaved(true);
     setTimeout(() => setIsDraftSaved(false), 3000);
   };
@@ -47,6 +58,7 @@ export default function ProjectEvaluation() {
           <span className="text-sm font-semibold">Evaluation draft saved securely.</span>
         </div>
       )}
+      
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center">
           <button onClick={() => navigate(-1)} className="p-2 mr-3 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-slate-600 shadow-sm">
@@ -57,6 +69,7 @@ export default function ProjectEvaluation() {
             <p className="text-slate-500 text-sm mt-1">Final grading rubric for <span className="font-bold text-purple-700">{student.name}</span></p>
           </div>
         </div>
+        
         <div className="bg-purple-50 text-purple-700 px-6 py-3 rounded-xl font-black text-2xl border border-purple-200 shadow-sm flex items-center">
           {totalScore} <span className="text-sm font-bold text-purple-500 ml-2 mt-1">/ 100 PTS</span>
         </div>
@@ -67,6 +80,7 @@ export default function ProjectEvaluation() {
            <FileSignature className="w-5 h-5 mr-2 text-purple-600"/>
            <h3 className="text-lg font-bold text-slate-800">Scoring Matrix</h3>
         </div>
+        
         <form className="p-6 space-y-8">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">

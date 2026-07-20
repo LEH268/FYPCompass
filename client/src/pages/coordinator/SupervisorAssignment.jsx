@@ -1,27 +1,38 @@
 // src/pages/coordinator/SupervisorAssignment.jsx
 import { useState } from "react";
-import { UserPlus, AlertCircle, Search, CheckCircle } from "lucide-react";
+import { UserPlus, AlertCircle, Search, CheckCircle, RefreshCw } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function SupervisorAssignment() {
   const { students, faculty, assignSupervisor } = useData();
   const [assignmentSuccess, setAssignmentSuccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // NEW: Tab selection for assigning unassigned vs reassigning
+  const [activeTab, setActiveTab] = useState("unassigned");
+  const [selectedStudentId, setSelectedStudentId] = useState("");
 
   const unassignedStudents = students.filter(s => !s.supervisorId || s.supervisorName === "Unassigned");
+  const assignedStudents = students.filter(s => s.supervisorId && s.supervisorName !== "Unassigned");
+
   const filteredFaculty = faculty.filter(f => 
     f.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
     f.expertise?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleAssign = (facultyId) => {
-    if (unassignedStudents.length === 0) return;
-    const studentToAssign = unassignedStudents[0];
+    if (activeTab === "unassigned" && unassignedStudents.length === 0) return;
     
-    assignSupervisor(studentToAssign.id, facultyId);
-    
+    const studentIdToAssign = activeTab === "unassigned" ? unassignedStudents[0].id : selectedStudentId;
+    if (!studentIdToAssign) {
+        alert("Please select a student first.");
+        return;
+    }
+
+    assignSupervisor(studentIdToAssign, facultyId);
     setAssignmentSuccess(true);
     setTimeout(() => setAssignmentSuccess(false), 3000);
+    setSelectedStudentId(""); // Reset selection
   };
 
   return (
@@ -29,13 +40,13 @@ export default function SupervisorAssignment() {
       {assignmentSuccess && (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center z-50 animate-in slide-in-from-top-5 duration-300">
           <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
-          <span className="text-sm font-bold tracking-wide">Student successfully assigned. Workload updated.</span>
+          <span className="text-sm font-bold tracking-wide">Assignment successfully updated. Workload adjusted.</span>
         </div>
       )}
-
+      
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Supervisor Allocation</h1>
-        <p className="text-slate-500 mt-1 font-medium">Manage faculty workload and assign pending students.</p>
+        <p className="text-slate-500 mt-1 font-medium">Manage faculty workload, assign pending students, or reassign existing ones.</p>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -51,31 +62,64 @@ export default function SupervisorAssignment() {
                 {unassignedStudents.length > 0 ? 'Action Required' : 'All Clear'}
               </h3>
               <p className={`text-xs mt-1 font-bold ${unassignedStudents.length > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                {unassignedStudents.length} students awaiting assignment.
+                {unassignedStudents.length} students awaiting initial assignment.
               </p>
             </div>
           </div>
           
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-              <h3 className="font-bold text-slate-800">Pending Students Queue</h3>
+            <div className="flex border-b border-slate-100">
+               <button 
+                  onClick={() => setActiveTab("unassigned")}
+                  className={`flex-1 py-3 text-sm font-bold text-center transition-colors ${activeTab === "unassigned" ? "bg-slate-50 text-indigo-700 border-b-2 border-indigo-600" : "text-slate-500 hover:bg-slate-50"}`}
+               >
+                  Pending Queue
+               </button>
+               <button 
+                  onClick={() => setActiveTab("reassign")}
+                  className={`flex-1 py-3 text-sm font-bold text-center transition-colors ${activeTab === "reassign" ? "bg-slate-50 text-indigo-700 border-b-2 border-indigo-600" : "text-slate-500 hover:bg-slate-50"}`}
+               >
+                  Reassign Student
+               </button>
             </div>
-            <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
-              {unassignedStudents.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 text-sm font-bold">All students have been assigned!</div>
+            
+            <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto p-4">
+              {activeTab === "unassigned" ? (
+                  unassignedStudents.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500 text-sm font-bold">All students have been assigned!</div>
+                  ) : (
+                    unassignedStudents.map((student) => (
+                      <div key={student.id} className="p-4 bg-white border-l-4 border-indigo-500 mb-3 shadow-sm rounded-r-lg">
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="font-bold text-slate-800 text-sm">{student.name}</span>
+                          <span className="text-[10px] font-black tracking-wider bg-slate-200 text-slate-600 px-2 py-0.5 rounded">GPA: {student.gpa}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mb-2 font-bold tracking-wide">ID: {student.id}</p>
+                        <p className="text-xs font-semibold text-indigo-700 bg-indigo-50 p-2 rounded border border-indigo-100">
+                          Proposed: {student.topic}
+                        </p>
+                      </div>
+                    ))
+                  )
               ) : (
-                unassignedStudents.map((student) => (
-                  <div key={student.id} className="p-4 bg-white border-l-4 border-indigo-500">
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="font-bold text-slate-800 text-sm">{student.name}</span>
-                      <span className="text-[10px] font-black tracking-wider bg-slate-200 text-slate-600 px-2 py-0.5 rounded">CGPA: {student.gpa}</span>
-                    </div>
-                    <p className="text-xs text-slate-500 mb-2 font-bold tracking-wide">ID: {student.id}</p>
-                    <p className="text-xs font-semibold text-indigo-700 bg-indigo-50 p-2 rounded border border-indigo-100">
-                      Proposed: {student.topic}
-                    </p>
-                  </div>
-                ))
+                 <div className="space-y-4">
+                    <p className="text-xs font-bold text-slate-500">Select a student to change their assigned supervisor:</p>
+                    <select 
+                       value={selectedStudentId}
+                       onChange={(e) => setSelectedStudentId(e.target.value)}
+                       className="w-full p-3 border border-slate-300 rounded-lg outline-none focus:border-indigo-600 text-sm font-semibold shadow-sm"
+                    >
+                       <option value="">-- Choose Assigned Student --</option>
+                       {assignedStudents.map(s => (
+                          <option key={s.id} value={s.id}>{s.name} (Current: {s.supervisorName})</option>
+                       ))}
+                    </select>
+                    {selectedStudentId && (
+                       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-800">
+                           Now select an available supervisor from the capacity dashboard to finalize the reassignment.
+                       </div>
+                    )}
+                 </div>
               )}
             </div>
           </div>
@@ -95,6 +139,8 @@ export default function SupervisorAssignment() {
               const capacityPercentage = (member.currentLoad / member.maxLoad) * 100;
               const isFull = member.currentLoad >= member.maxLoad;
               
+              const disableAssignBtn = isFull || (activeTab === "unassigned" ? unassignedStudents.length === 0 : !selectedStudentId);
+
               return (
                 <div key={member.id} className={`p-5 rounded-xl border transition-all shadow-sm ${isFull ? 'border-rose-200 bg-rose-50/30' : 'border-slate-200 hover:border-indigo-300 bg-white'}`}>
                   <div className="flex items-center mb-3">
@@ -117,8 +163,8 @@ export default function SupervisorAssignment() {
                     </div>
                   </div>
                   
-                  <button onClick={() => handleAssign(member.id)} disabled={isFull || unassignedStudents.length === 0} className={`w-full py-2.5 rounded-lg text-sm font-bold flex items-center justify-center transition-all ${isFull || unassignedStudents.length === 0 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 shadow-sm active:scale-95'}`}>
-                    <UserPlus className="w-4 h-4 mr-2" /> {isFull ? 'Capacity Full' : 'Assign Top Student'}
+                  <button onClick={() => handleAssign(member.id)} disabled={disableAssignBtn} className={`w-full py-2.5 rounded-lg text-sm font-bold flex items-center justify-center transition-all ${disableAssignBtn ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 shadow-sm active:scale-95'}`}>
+                    {isFull ? <><UserPlus className="w-4 h-4 mr-2" /> Capacity Full</> : activeTab === "unassigned" ? <><UserPlus className="w-4 h-4 mr-2" /> Assign Top Student</> : <><RefreshCw className="w-4 h-4 mr-2" /> Reassign Here</>}
                   </button>
                 </div>
               );

@@ -1,13 +1,13 @@
 // src/pages/coordinator/CoordinatorStudentDetails.jsx
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, User, FileText, History, Award } from "lucide-react";
+import { ArrowLeft, User, FileText, History, Award, Download } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function CoordinatorStudentDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { students, submissions, consultations } = useData();
-  
+
   const student = students.find(s => s.id === id);
   const studentSubmissions = submissions.filter(sub => sub.studentId === id).sort((a,b) => b.id - a.id);
   const studentConsultations = consultations.filter(c => c.studentId === id).sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -84,9 +84,18 @@ export default function CoordinatorStudentDetails() {
           )}
           
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center">
-              <FileText className="w-5 h-5 mr-2 text-indigo-600" />
-              <h3 className="text-lg font-bold text-slate-800">Submissions & Feedback Audit</h3>
+            <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+              <div className="flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-indigo-600" />
+                <h3 className="text-lg font-bold text-slate-800">Submissions & Feedback Audit</h3>
+              </div>
+              {/* NEW: Download all files functionality */}
+              {studentSubmissions.length > 0 && (
+                <button onClick={() => alert("Downloading all student files as a complete ZIP package...")} className="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm">
+                  <Download className="w-4 h-4 mr-1" />
+                  Download All
+                </button>
+              )}
             </div>
             <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto">
               {studentSubmissions.length === 0 ? <p className="text-slate-500 text-sm font-medium">No submissions found.</p> : studentSubmissions.map((sub) => (
