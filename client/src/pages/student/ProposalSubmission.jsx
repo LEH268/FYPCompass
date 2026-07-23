@@ -17,27 +17,21 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useData } from "../../context/DataContext";
+import {
+  MILESTONE_NAMES,
+  SUBMISSION_STATUS,
+  FILE_RULES,
+  MIN_DESCRIPTION_LENGTH,
+  CURRENT_STUDENT,
+  formatDueDate,
+} from "../../constants/milestones";
 
-const MILESTONES = [
-  "Project Proposal",
-  "System Requirements Document (SRD)",
-  "System Design Specification (SDS)",
-  "System Implementation",
-  "Final Report",
-];
-
-const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx", "zip"];
-const ALLOWED_MIME_TYPES = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/zip",
-  "application/x-zip-compressed",
-  "multipart/x-zip",
-];
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-const ACCEPT_ATTR = ".pdf,.doc,.docx,.zip";
-const MIN_DESCRIPTION_LENGTH = 10;
+const {
+  ALLOWED_EXTENSIONS,
+  ALLOWED_MIME_TYPES,
+  MAX_FILE_SIZE,
+  ACCEPT_ATTR,
+} = FILE_RULES;
 
 export default function ProposalSubmission() {
   const { submissions, addSubmission, updateSubmission, deleteSubmission } =
@@ -47,7 +41,7 @@ export default function ProposalSubmission() {
   const [showForm, setShowForm] = useState(false);
   const [filterMilestone, setFilterMilestone] = useState("All");
 
-  // Form state — milestone now starts EMPTY so "not selected" is a real state
+  // Form state — milestone starts EMPTY so "not selected" is a real state
   const [editingId, setEditingId] = useState(null);
   const [selectedMilestone, setSelectedMilestone] = useState("");
   const [file, setFile] = useState(null);
@@ -60,8 +54,8 @@ export default function ProposalSubmission() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  const mySubmissions = submissions
-    .filter((sub) => sub.studentId === "25001001")
+  const mySubmissions = (submissions || [])
+    .filter((sub) => sub.studentId === CURRENT_STUDENT.id)
     .filter(
       (sub) => filterMilestone === "All" || sub.milestone === filterMilestone
     )
@@ -89,7 +83,7 @@ export default function ProposalSubmission() {
     return null;
   };
 
-  // Draft mode is lenient: only the file is mandatory.
+  // Draft mode is lenient: milestone + file only. Description is not required.
   const validateForm = (isDraft = false) => {
     const nextErrors = {};
 
@@ -106,7 +100,8 @@ export default function ProposalSubmission() {
     if (!isDraft) {
       const trimmed = studentMessage.trim();
       if (!trimmed) {
-        nextErrors.description = "Please provide a description of this submission.";
+        nextErrors.description =
+          "Please provide a description of this submission.";
       } else if (trimmed.length < MIN_DESCRIPTION_LENGTH) {
         nextErrors.description = `Description must be at least ${MIN_DESCRIPTION_LENGTH} characters.`;
       }
@@ -128,7 +123,7 @@ export default function ProposalSubmission() {
       setErrors((prev) => ({ ...prev, file: error }));
       setFile(null);
       if (!editingId) setFileName(null);
-      e.target.value = "";
+      e.target.value = ""; // allow re-picking the same file after a fix
       return;
     }
 
@@ -146,7 +141,8 @@ export default function ProposalSubmission() {
     setSelectedMilestone(value);
     setTouched((t) => ({ ...t, milestone: true }));
     setErrors((prev) => {
-      if (!value) return { ...prev, milestone: "Please select a milestone type." };
+      if (!value)
+        return { ...prev, milestone: "Please select a milestone type." };
       const { milestone: _removed, ...rest } = prev;
       return rest;
     });
@@ -159,7 +155,10 @@ export default function ProposalSubmission() {
       setErrors((prev) => {
         const trimmed = value.trim();
         if (!trimmed) {
-          return { ...prev, description: "Please provide a description of this submission." };
+          return {
+            ...prev,
+            description: "Please provide a description of this submission.",
+          };
         }
         if (trimmed.length < MIN_DESCRIPTION_LENGTH) {
           return {
@@ -205,7 +204,7 @@ export default function ProposalSubmission() {
   };
 
   const processSubmission = (status) => {
-    const isDraft = status === "Draft";
+    const isDraft = status === SUBMISSION_STATUS.DRAFT;
     const validationErrors = validateForm(isDraft);
 
     // Mark every field as touched so all messages surface at once
@@ -224,7 +223,7 @@ export default function ProposalSubmission() {
       const payload = {
         milestone: selectedMilestone,
         file: fileName,
-        date: new Date().toISOString().split("T")[0],
+        date: new Date().toLocaleDateString("en-CA"),
         studentMessage: studentMessage.trim(),
         status: status,
       };
@@ -232,7 +231,8 @@ export default function ProposalSubmission() {
       if (editingId) {
         updateSubmission(editingId, {
           ...payload,
-          ...(status === "Pending Review" && {
+          // Similarity is only generated at the moment of final submission
+          ...(status === SUBMISSION_STATUS.PENDING && {
             similarityScore: Math.floor(Math.random() * 15) + 5,
           }),
         });
@@ -243,8 +243,8 @@ export default function ProposalSubmission() {
         );
       } else {
         addSubmission({
-          studentId: "25001001",
-          studentName: "Oliver Smith",
+          studentId: CURRENT_STUDENT.id,
+          studentName: CURRENT_STUDENT.name,
           ...payload,
           similarityScore: isDraft ? null : Math.floor(Math.random() * 15) + 5,
         });
@@ -263,12 +263,12 @@ export default function ProposalSubmission() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    processSubmission("Pending Review");
+    processSubmission(SUBMISSION_STATUS.PENDING);
   };
 
   const handleSaveDraft = (e) => {
     e.preventDefault();
-    processSubmission("Draft");
+    processSubmission(SUBMISSION_STATUS.DRAFT);
   };
 
   const handleDeleteDraft = (id) => {
@@ -338,7 +338,7 @@ export default function ProposalSubmission() {
               className="w-full pl-9 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-600 outline-none shadow-sm transition-all appearance-none"
             >
               <option value="All">All Milestones</option>
-              {MILESTONES.map((m) => (
+              {MILESTONE_NAMES.map((m) => (
                 <option key={m} value={m}>
                   {m}
                 </option>
@@ -361,17 +361,17 @@ export default function ProposalSubmission() {
                 className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex-1">
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-2 gap-3">
                     <h3 className="font-bold text-slate-800">
                       {sub.milestone}
                     </h3>
                     <span
-                      className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded ${
-                        sub.status === "Approved"
+                      className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded whitespace-nowrap ${
+                        sub.status === SUBMISSION_STATUS.APPROVED
                           ? "bg-emerald-100 text-emerald-700"
-                          : sub.status === "Draft"
+                          : sub.status === SUBMISSION_STATUS.DRAFT
                           ? "bg-slate-200 text-slate-700"
-                          : sub.status === "Pending Review"
+                          : sub.status === SUBMISSION_STATUS.PENDING
                           ? "bg-amber-100 text-amber-700"
                           : "bg-rose-100 text-rose-700"
                       }`}
@@ -380,7 +380,7 @@ export default function ProposalSubmission() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mb-4">
-                    Last Updated: {sub.date}
+                    Last Updated: {formatDueDate(sub.date)}
                   </p>
 
                   <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg mb-4">
@@ -395,7 +395,7 @@ export default function ProposalSubmission() {
                     </button>
                   </div>
 
-                  {sub.status !== "Draft" && (
+                  {sub.status !== SUBMISSION_STATUS.DRAFT && (
                     <div className="flex items-center gap-2 mb-4 p-2 bg-blue-50/50 rounded-lg border border-blue-100">
                       <ShieldAlert className="w-4 h-4 text-blue-500" />
                       <span className="text-xs font-semibold text-slate-600">
@@ -424,7 +424,7 @@ export default function ProposalSubmission() {
                     </div>
                   )}
 
-                  {sub.status === "Draft" && (
+                  {sub.status === SUBMISSION_STATUS.DRAFT && (
                     <div className="flex items-center gap-3 mt-4 pt-4 border-t border-slate-100">
                       <button
                         onClick={() => openEditForm(sub)}
@@ -447,7 +447,7 @@ export default function ProposalSubmission() {
                     <MessageSquare className="w-4 h-4 mr-1" /> Supervisor
                     Feedback:
                   </p>
-                  {sub.status === "Draft" ? (
+                  {sub.status === SUBMISSION_STATUS.DRAFT ? (
                     <p className="text-sm text-slate-400 italic">
                       This is a draft. Submit to request evaluation.
                     </p>
@@ -519,10 +519,8 @@ export default function ProposalSubmission() {
                       : "bg-slate-50 border border-slate-200 text-slate-700 focus:ring-2 focus:ring-indigo-600"
                   }`}
                 >
-                  <option value="" disabled={false}>
-                    -- Select a milestone --
-                  </option>
-                  {MILESTONES.map((m) => (
+                  <option value="">-- Select a milestone --</option>
+                  {MILESTONE_NAMES.map((m) => (
                     <option key={m} value={m}>
                       {m}
                     </option>

@@ -10,6 +10,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import ProposalSubmission from "./pages/student/ProposalSubmission";
 import MilestoneTimeline from "./pages/student/MilestoneTimeline";
 import ConsultationRecords from "./pages/student/ConsultationRecords";
+import FeedbackNotifications from "./pages/student/FeedbackNotifications";
 
 // Supervisor Pages
 import SupervisorDashboard from "./pages/supervisor/SupervisorDashboard";
@@ -48,6 +49,7 @@ export default function App() {
             <Route index element={<StudentDashboard />} />
             <Route path="proposal" element={<ProposalSubmission />} />
             <Route path="milestones" element={<MilestoneTimeline />} />
+            <Route path="feedback" element={<FeedbackNotifications />} />
             <Route path="consultations" element={<ConsultationRecords />} />
           </Route>
 

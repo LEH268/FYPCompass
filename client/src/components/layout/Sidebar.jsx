@@ -1,6 +1,17 @@
 // src/components/layout/Sidebar.jsx
 import { NavLink } from "react-router-dom";
-import { GraduationCap, LayoutDashboard, Flag, FileUp, Users, MessageSquare, LogOut, ClipboardCheck, UserCog, Settings } from "lucide-react";
+import {
+  GraduationCap,
+  LayoutDashboard,
+  Flag,
+  FileUp,
+  Users,
+  MessageSquare,
+  LogOut,
+  ClipboardCheck,
+  UserCog,
+  Settings,
+} from "lucide-react";
 
 export default function Sidebar({ role }) {
   const getNavLinks = () => {
@@ -10,6 +21,7 @@ export default function Sidebar({ role }) {
           { name: "Dashboard", path: "/student", icon: LayoutDashboard },
           { name: "Milestones", path: "/student/milestones", icon: Flag },
           { name: "Submissions", path: "/student/proposal", icon: FileUp },
+          { name: "Feedback", path: "/student/feedback", icon: MessageSquare },
           { name: "Consultations", path: "/student/consultations", icon: Users },
         ];
       case "supervisor":
@@ -44,7 +56,7 @@ export default function Sidebar({ role }) {
         <GraduationCap className="h-7 w-7 text-white mr-2" />
         <span className="text-xl font-bold tracking-wide">FYPCompass</span>
       </div>
-      
+
       <div className="flex-1 overflow-y-auto py-6 px-4">
         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">
           Academic Menu
@@ -69,9 +81,12 @@ export default function Sidebar({ role }) {
           ))}
         </nav>
       </div>
-      
+
       <div className="p-4 border-t border-slate-100 space-y-1 bg-slate-50">
-        <NavLink to="/login" className="flex w-full items-center px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-100 transition-colors">
+        <NavLink
+          to="/login"
+          className="flex w-full items-center px-3 py-2 text-sm font-medium text-rose-600 rounded-lg hover:bg-rose-100 transition-colors"
+        >
           <LogOut className="h-5 w-5 mr-3" /> Logout
         </NavLink>
       </div>
