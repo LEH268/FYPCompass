@@ -111,9 +111,15 @@ export const DataProvider = ({ children }) => {
   };
 
   const addSubmission = (submission) => {
-    setSubmissions(prev => [{ ...submission, id: Date.now(), status: "Pending Review", feedback: null }, ...prev]);
-    addNotification(submission.supervisorId || "F01", `${submission.studentName} has submitted ${submission.milestone} for review.`);
-    
+    // Respect the status passed in ("Draft" or "Pending Review"); default to Pending Review
+    const status = submission.status || "Pending Review";
+    setSubmissions(prev => [{ ...submission, id: Date.now(), status, feedback: null }, ...prev]);
+
+    // Drafts are private to the student, so no supervisor notification yet
+    if (status !== "Draft") {
+      addNotification(submission.supervisorId || "F01", `${submission.studentName} has submitted ${submission.milestone} for review.`);
+    }
+
     // Auto-update student progress instantly
     setStudents(prev => prev.map(s => {
       if(s.id === submission.studentId) {
@@ -122,6 +128,26 @@ export const DataProvider = ({ children }) => {
       }
       return s;
     }));
+  };
+
+  // NEW: update an existing submission (used for editing drafts)
+  const updateSubmission = (id, updates) => {
+    setSubmissions(prev => {
+      const target = prev.find(sub => sub.id === id);
+      const updated = prev.map(sub => sub.id === id ? { ...sub, ...updates } : sub);
+
+      // Notify the supervisor only when a draft is promoted to a real submission
+      if (target && target.status === "Draft" && updates.status && updates.status !== "Draft") {
+        addNotification("F01", `${target.studentName} has submitted ${updates.milestone || target.milestone} for review.`);
+      }
+
+      return updated;
+    });
+  };
+
+  // NEW: remove a submission (used for deleting drafts)
+  const deleteSubmission = (id) => {
+    setSubmissions(prev => prev.filter(sub => sub.id !== id));
   };
 
   const gradeSubmission = (id, status, feedback) => {
@@ -167,7 +193,7 @@ export const DataProvider = ({ children }) => {
   return (
     <DataContext.Provider value={{
       students, faculty, submissions, consultations, notifications, evaluationDrafts,
-      assignSupervisor, addSubmission, gradeSubmission, addConsultation, markNotificationAsRead, markAllNotificationsAsRead, saveEvaluationDraft
+      assignSupervisor, addSubmission, updateSubmission, deleteSubmission, gradeSubmission, addConsultation, markNotificationAsRead, markAllNotificationsAsRead, saveEvaluationDraft
     }}>
       {children}
     </DataContext.Provider>
