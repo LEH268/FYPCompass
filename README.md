@@ -1,8 +1,6 @@
 # FYPCompass
 
-FYPCompass is a web-based Final Year Project (FYP) management platform built for Malaysian private universities. It centralises FYP supervision — proposal submission, milestone tracking, consultation records, feedback, supervisor assignment, and examiner evaluation — into a single system, replacing the fragmented mix of email, spreadsheets, and chat tools currently used to manage the FYP process.
-
-This repository contains the frontend prototype, built as part of the BIS2102 coursework.
+FYPCompass is a Final Year Project (FYP) website to manage the flow of completing FYP for Malaysian private universities. It centralises FYP supervisioninto a single system to address ossies of fragmented mix of email, spreadsheets, and chat tools currently used to manage the FYP process. This is a prototyppe built as part of the BIS2102 Information System Analysis and Design Mini Project.
 
 ## Features
 
@@ -78,4 +76,7 @@ FYPCompass is developed as a coursework project for **BIS2102**, addressing frag
 
 ## License
 
-This project is for academic purposes as part of BIS2102 coursework.
+This project is for academic purposes as part of BIS2102 Mini Project by:
+Lee Earn Hui (25008442)
+Grace Wong Xin En (24127094)
+Muhammad Amirul Aijaz Bin Nor Azham Hakim (23068810)
