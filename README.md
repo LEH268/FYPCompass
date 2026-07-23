@@ -365,9 +365,3 @@ This project was developed for academic purposes only as part of the **BIS2102 I
 Commercial use is not permitted without permission from the authors.
 
 ---
-
-<div align="center">
-
-Made with ❤️ using React, Vite and Tailwind CSS
-
-</div>
