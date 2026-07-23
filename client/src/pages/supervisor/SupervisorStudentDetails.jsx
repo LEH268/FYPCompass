@@ -1,17 +1,19 @@
 // src/pages/supervisor/SupervisorStudentDetails.jsx
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, User, Calendar, FileText, Download, MessageSquare, History, MessageCircle, X, Send } from "lucide-react";
+import { ArrowLeft, User, Calendar, FileText, Download, MessageSquare, History, MessageCircle, X, Send, StickyNote, CheckCircle, AlertCircle } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function SupervisorStudentDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { students, submissions, consultations } = useData();
-  
+  const { students, submissions, consultations, progressComments, addProgressComment } = useData();  
   const student = students.find(s => s.id === id);
   const studentSubmissions = submissions.filter(sub => sub.studentId === id).sort((a,b) => b.id - a.id);
   const studentConsultations = consultations.filter(c => c.studentId === id).sort((a,b) => new Date(b.date) - new Date(a.date));
+  const studentComments = (progressComments || [])
+    .filter((c) => c.studentId === id)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   // Chat State for Floating Widget
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -19,6 +21,9 @@ export default function SupervisorStudentDetails() {
   const chatEndRef = useRef(null);
 
   // Mock Chat History between Supervisor and Student
+  const [commentText, setCommentText] = useState("");
+  const [commentError, setCommentError] = useState(null);
+  const [commentSaved, setCommentSaved] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     { id: 1, sender: "me", text: `Hi ${student?.name.split(' ')[0]}, how is the progress on your upcoming deliverable?`, time: "Yesterday, 2:30 PM" },
     { id: 2, sender: "student", text: "I'm currently finalizing the diagrams. I'll submit them soon.", time: "Yesterday, 3:15 PM" },
@@ -41,6 +46,26 @@ export default function SupervisorStudentDetails() {
       { id: Date.now(), sender: "me", text: chatInput, time: "Just now" }
     ]);
     setChatInput("");
+  };
+
+  const handleAddComment = (e) => {
+    e.preventDefault();
+    const trimmed = commentText.trim();
+
+    if (!trimmed) {
+      setCommentError("Please enter a comment before saving.");
+      return;
+    }
+    if (trimmed.length < 10) {
+      setCommentError("Comment must be at least 10 characters.");
+      return;
+    }
+
+    setCommentError(null);
+    addProgressComment(id, trimmed);
+    setCommentText("");
+    setCommentSaved(true);
+    setTimeout(() => setCommentSaved(false), 3000);
   };
 
   const handleDownload = (fileName) => {
@@ -117,6 +142,80 @@ export default function SupervisorStudentDetails() {
                   <p className="text-xs text-slate-600 mt-1 line-clamp-2 italic">"{c.summary}"</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Progress comments — does not modify progress status */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h3 className="font-bold text-slate-800 flex items-center mb-1">
+              <StickyNote className="w-5 h-5 mr-2 text-indigo-600" /> Progress Comments
+            </h3>
+            <p className="text-xs text-slate-500 mb-4">
+              Notes visible to you only. Adding a comment does not change the student's
+              progress status.
+            </p>
+
+            <form onSubmit={handleAddComment} className="space-y-3" noValidate>
+              <textarea
+                rows="3"
+                value={commentText}
+                onChange={(e) => {
+                  setCommentText(e.target.value);
+                  if (commentError) setCommentError(null);
+                }}
+                placeholder="e.g. Student is progressing well; discussed narrowing project scope."
+                aria-invalid={!!commentError}
+                className={`w-full px-3 py-2.5 rounded-xl outline-none resize-none text-sm transition-colors ${
+                  commentError
+                    ? "bg-rose-50 border-2 border-rose-400 focus:ring-2 focus:ring-rose-500"
+                    : "bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-600"
+                }`}
+              />
+
+              {commentError && (
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-rose-600">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  {commentError}
+                </p>
+              )}
+
+              {commentSaved && (
+                <div className="flex items-start gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-emerald-700">Comment saved.</p>
+                    <p className="text-[11px] text-emerald-600 mt-0.5">
+                      Progress status remains {student.progress}% — {student.stage}.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-lg hover:bg-indigo-700 shadow-sm active:scale-95 transition-all"
+              >
+                Save Comment
+              </button>
+            </form>
+
+            <div className="mt-5 pt-4 border-t border-slate-100 space-y-3 max-h-56 overflow-y-auto pr-1">
+              {studentComments.length === 0 ? (
+                <p className="text-sm text-slate-400 italic text-center py-2">
+                  No comments recorded yet.
+                </p>
+              ) : (
+                studentComments.map((c) => (
+                  <div key={c.id} className="border-l-2 border-slate-300 pl-3 py-1">
+                    <p className="text-[11px] font-bold text-slate-400">
+                      {c.date} • {c.author}
+                    </p>
+                    <p className="text-sm text-slate-700 mt-0.5 leading-relaxed">
+                      {c.comment}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

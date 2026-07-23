@@ -1,11 +1,13 @@
 // src/pages/coordinator/SupervisorAssignment.jsx
 import { useState } from "react";
-import { UserPlus, AlertCircle, Search, CheckCircle, RefreshCw } from "lucide-react";
+import { UserPlus, AlertCircle, Search, CheckCircle, RefreshCw, XCircle } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function SupervisorAssignment() {
   const { students, faculty, assignSupervisor } = useData();
-  const [assignmentSuccess, setAssignmentSuccess] = useState(false);
+  const [assignmentSuccess, setAssignmentSuccess] = useState(null);
+  const [assignmentError, setAssignmentError] = useState(null);
+  const [selectedUnassignedId, setSelectedUnassignedId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   
   // NEW: Tab selection for assigning unassigned vs reassigning
@@ -21,18 +23,33 @@ export default function SupervisorAssignment() {
   );
 
   const handleAssign = (facultyId) => {
-    if (activeTab === "unassigned" && unassignedStudents.length === 0) return;
-    
-    const studentIdToAssign = activeTab === "unassigned" ? unassignedStudents[0].id : selectedStudentId;
+    const studentIdToAssign =
+      activeTab === "unassigned"
+        ? selectedUnassignedId || unassignedStudents[0]?.id
+        : selectedStudentId;
+
     if (!studentIdToAssign) {
-        alert("Please select a student first.");
-        return;
+      setAssignmentError("Please select a student first.");
+      setTimeout(() => setAssignmentError(null), 4000);
+      return;
     }
 
-    assignSupervisor(studentIdToAssign, facultyId);
-    setAssignmentSuccess(true);
-    setTimeout(() => setAssignmentSuccess(false), 3000);
-    setSelectedStudentId(""); // Reset selection
+    const result = assignSupervisor(studentIdToAssign, facultyId);
+
+    if (result && result.ok === false) {
+      setAssignmentError(result.reason);
+      setAssignmentSuccess(null);
+      setTimeout(() => setAssignmentError(null), 5000);
+      return;
+    }
+
+    const studentName = students.find((s) => s.id === studentIdToAssign)?.name || "Student";
+    const facultyName = faculty.find((f) => f.id === facultyId)?.name || "supervisor";
+    setAssignmentSuccess(`${studentName} assigned to ${facultyName}. Workload adjusted.`);
+    setAssignmentError(null);
+    setSelectedStudentId("");
+    setSelectedUnassignedId("");
+    setTimeout(() => setAssignmentSuccess(null), 4000);
   };
 
   return (
@@ -40,7 +57,14 @@ export default function SupervisorAssignment() {
       {assignmentSuccess && (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center z-50 animate-in slide-in-from-top-5 duration-300">
           <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
-          <span className="text-sm font-bold tracking-wide">Assignment successfully updated. Workload adjusted.</span>
+          <span className="text-sm font-bold tracking-wide">{assignmentSuccess}</span>
+        </div>
+      )}
+
+      {assignmentError && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-rose-600 text-white px-6 py-3 rounded-full shadow-2xl flex items-center z-50 animate-in slide-in-from-top-5 duration-300">
+          <XCircle className="w-5 h-5 text-white mr-2" />
+          <span className="text-sm font-bold tracking-wide">{assignmentError}</span>
         </div>
       )}
       
@@ -89,15 +113,32 @@ export default function SupervisorAssignment() {
                     <div className="p-8 text-center text-slate-500 text-sm font-bold">All students have been assigned!</div>
                   ) : (
                     unassignedStudents.map((student) => (
-                      <div key={student.id} className="p-4 bg-white border-l-4 border-indigo-500 mb-3 shadow-sm rounded-r-lg">
+                      <div
+                        key={student.id}
+                        onClick={() => setSelectedUnassignedId(student.id)}
+                        className={`p-4 mb-3 shadow-sm rounded-r-lg cursor-pointer transition-all border-l-4 ${
+                          selectedUnassignedId === student.id
+                            ? "bg-indigo-50 border-indigo-600 ring-1 ring-indigo-200"
+                            : "bg-white border-indigo-500 hover:bg-slate-50"
+                        }`}
+                      >
                         <div className="flex justify-between items-start mb-1">
                           <span className="font-bold text-slate-800 text-sm">{student.name}</span>
-                          <span className="text-[10px] font-black tracking-wider bg-slate-200 text-slate-600 px-2 py-0.5 rounded">GPA: {student.gpa}</span>
+                          <span className="text-[10px] font-black tracking-wider bg-slate-200 text-slate-600 px-2 py-0.5 rounded">
+                            GPA: {student.gpa}
+                          </span>
                         </div>
-                        <p className="text-xs text-slate-500 mb-2 font-bold tracking-wide">ID: {student.id}</p>
+                        <p className="text-xs text-slate-500 mb-2 font-bold tracking-wide">
+                          ID: {student.id}
+                        </p>
                         <p className="text-xs font-semibold text-indigo-700 bg-indigo-50 p-2 rounded border border-indigo-100">
                           Proposed: {student.topic}
                         </p>
+                        {selectedUnassignedId === student.id && (
+                          <p className="text-[11px] font-bold text-indigo-600 mt-2">
+                            ✓ Selected — now choose a supervisor
+                          </p>
+                        )}
                       </div>
                     ))
                   )
@@ -139,7 +180,10 @@ export default function SupervisorAssignment() {
               const capacityPercentage = (member.currentLoad / member.maxLoad) * 100;
               const isFull = member.currentLoad >= member.maxLoad;
               
-              const disableAssignBtn = isFull || (activeTab === "unassigned" ? unassignedStudents.length === 0 : !selectedStudentId);
+              const disableAssignBtn =
+                activeTab === "unassigned"
+                  ? unassignedStudents.length === 0
+                  : !selectedStudentId;
 
               return (
                 <div key={member.id} className={`p-5 rounded-xl border transition-all shadow-sm ${isFull ? 'border-rose-200 bg-rose-50/30' : 'border-slate-200 hover:border-indigo-300 bg-white'}`}>
@@ -164,7 +208,13 @@ export default function SupervisorAssignment() {
                   </div>
                   
                   <button onClick={() => handleAssign(member.id)} disabled={disableAssignBtn} className={`w-full py-2.5 rounded-lg text-sm font-bold flex items-center justify-center transition-all ${disableAssignBtn ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 shadow-sm active:scale-95'}`}>
-                    {isFull ? <><UserPlus className="w-4 h-4 mr-2" /> Capacity Full</> : activeTab === "unassigned" ? <><UserPlus className="w-4 h-4 mr-2" /> Assign Top Student</> : <><RefreshCw className="w-4 h-4 mr-2" /> Reassign Here</>}
+                    {isFull ? (
+                      <><AlertCircle className="w-4 h-4 mr-2" /> At Capacity — Try Assign</>
+                    ) : activeTab === "unassigned" ? (
+                      <><UserPlus className="w-4 h-4 mr-2" /> Assign Selected Student</>
+                    ) : (
+                      <><RefreshCw className="w-4 h-4 mr-2" /> Reassign Here</>
+                    )}
                   </button>
                 </div>
               );

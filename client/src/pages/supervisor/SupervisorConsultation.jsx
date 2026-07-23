@@ -1,14 +1,14 @@
 // src/pages/supervisor/SupervisorConsultation.jsx
 import { useState, useMemo } from "react";
-import { Calendar, Plus, Users, Clock, Search, ChevronDown, ChevronUp, Video, Edit3 } from "lucide-react";
+import { Calendar, Plus, Users, Clock, Search, ChevronUp, Video, Edit3, CheckCircle } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
 export default function SupervisorConsultation() {
-  const { consultations, addConsultation, students } = useData();
-  const [showModal, setShowModal] = useState(false);
+  const { consultations, addConsultation, updateConsultation, students } = useData();  const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("schedule"); // "schedule" or "log"
   const [expandedId, setExpandedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [savedMessage, setSavedMessage] = useState(null);
   
   // Edit State
   const [editLogData, setEditLogData] = useState(null);
@@ -16,17 +16,19 @@ export default function SupervisorConsultation() {
   // Filter only supervisees belonging to this mocked supervisor
   const mySupervisees = students.filter(s => s.supervisorId === "F01");
 
-  const [localLogs, setLocalLogs] = useState([...consultations]);
-
   const sortedLogs = useMemo(() => {
-    return [...localLogs]
-      .filter(log => log.studentName.toLowerCase().includes(searchQuery.toLowerCase()) || log.topic.toLowerCase().includes(searchQuery.toLowerCase()))
+    return (consultations || [])
+      .filter(
+        (log) =>
+          log.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          log.topic.toLowerCase().includes(searchQuery.toLowerCase())
+      )
       .sort((a, b) => {
         const dateA = new Date(`${a.date}T${a.time}`);
         const dateB = new Date(`${b.date}T${b.time}`);
         return dateB - dateA;
       });
-  }, [localLogs, searchQuery]);
+  }, [consultations, searchQuery]);
 
   const handleOpenModal = (mode) => {
     setModalMode(mode);
@@ -40,23 +42,21 @@ export default function SupervisorConsultation() {
     setShowModal(true);
   };
 
-  const handleFormSubmit = (e) => {
+const handleFormSubmit = (e) => {
     e.preventDefault();
-    
+
     if (modalMode === "edit" && editLogData) {
-      const updatedLogs = localLogs.map(log => 
-        log.id === editLogData.id ? { 
-          ...log, 
-          summary: e.target.summary.value, 
-          actionItems: e.target.actionItems.value,
-          videoLink: e.target.videoLink?.value || log.videoLink
-        } : log
-      );
-      setLocalLogs(updatedLogs);
+      updateConsultation(editLogData.id, {
+        summary: e.target.summary.value,
+        actionItems: e.target.actionItems.value,
+        videoLink: e.target.videoLink?.value || editLogData.videoLink || "",
+      });
+      setSavedMessage("Consultation record updated successfully.");
     } else {
-      const studentData = mySupervisees.find(s => s.id === e.target.studentId.value);
-      const newLog = {
-        id: Date.now(),
+      const studentData = mySupervisees.find((s) => s.id === e.target.studentId.value);
+      if (!studentData) return;
+
+      addConsultation({
         studentId: studentData.id,
         studentName: studentData.name,
         date: e.target.logDate.value,
@@ -65,11 +65,17 @@ export default function SupervisorConsultation() {
         status: modalMode === "schedule" ? "Upcoming" : "Logged",
         summary: modalMode === "log" ? e.target.summary.value : "Scheduled Meeting",
         actionItems: modalMode === "log" ? e.target.actionItems.value : "Pending",
-        videoLink: modalMode === "log" ? e.target.videoLink.value : ""
-      };
-      setLocalLogs([newLog, ...localLogs]);
+        videoLink: modalMode === "log" ? e.target.videoLink.value : "",
+      });
+      setSavedMessage(
+        modalMode === "schedule"
+          ? "Consultation booked successfully."
+          : "Consultation session logged successfully."
+      );
     }
+
     setShowModal(false);
+    setTimeout(() => setSavedMessage(null), 3000);
   };
 
   const toggleExpand = (id) => {
@@ -79,6 +85,13 @@ export default function SupervisorConsultation() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto animate-in fade-in duration-500">
+      {savedMessage && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center z-50 animate-in slide-in-from-top-5 duration-300">
+          <CheckCircle className="w-5 h-5 text-emerald-400 mr-2" />
+          <span className="text-sm font-semibold">{savedMessage}</span>
+        </div>
+      )}
+      
       <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-800">Consultation Management</h1>

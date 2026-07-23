@@ -112,11 +112,11 @@ export const DataProvider = ({ children }) => {
     { id: "25001011", name: "Tony Stark", topic: "Arc Reactor Energy Efficiency", progress: 0, status: "On Track", stage: "Topic Selection", supervisorId: null, supervisorName: "Unassigned", examinerName: "Pending", gpa: 4.0 },
   ]);
 
-  const [faculty, setFaculty] = useState([
-    { id: "F01", name: "Dr. Alan Turing", expertise: "AI, Machine Learning", currentLoad: 6, maxLoad: 8 },
-    { id: "F02", name: "Dr. Siti Aminah", expertise: "IoT, Agriculture Tech", currentLoad: 5, maxLoad: 8 },
-    { id: "F03", name: "Prof. John Smith", expertise: "Cybersecurity, Blockchain", currentLoad: 0, maxLoad: 6 },
-    { id: "F04", name: "Dr. Rajesh Kumar", expertise: "Data Science, NLP", currentLoad: 4, maxLoad: 6 },
+const [faculty, setFaculty] = useState([
+    { id: "F01", name: "Dr. Alan Turing", expertise: "AI, Machine Learning", currentLoad: 6, maxLoad: 8, isAvailable: true },
+    { id: "F02", name: "Dr. Siti Aminah", expertise: "IoT, Agriculture Tech", currentLoad: 5, maxLoad: 8, isAvailable: true },
+    { id: "F03", name: "Prof. John Smith", expertise: "Cybersecurity, Blockchain", currentLoad: 0, maxLoad: 6, isAvailable: true },
+    { id: "F04", name: "Dr. Rajesh Kumar", expertise: "Data Science, NLP", currentLoad: 6, maxLoad: 6, isAvailable: true },
   ]);
 
   const [consultations, setConsultations] = useState([
@@ -133,6 +133,15 @@ export const DataProvider = ({ children }) => {
 
   const [evaluationDrafts, setEvaluationDrafts] = useState({});
 
+  const [progressComments, setProgressComments] = useState([
+    {
+      id: 1,
+      studentId: "25001002",
+      comment: "Hardware procurement delayed; adjusted expectations for the STD phase.",
+      author: "Dr. Alan Turing",
+      date: "2026-07-08",
+    },
+  ]);
   // --- ACTIONS ---
 
   const addNotification = (userId, message) => {
@@ -144,7 +153,14 @@ export const DataProvider = ({ children }) => {
 
   const assignSupervisor = (studentId, facultyId) => {
     const fac = faculty.find((f) => f.id === facultyId);
-    if (!fac) return;
+    if (!fac) return { ok: false, reason: "Supervisor not found." };
+    if (fac.isAvailable === false) {
+      return { ok: false, reason: `${fac.name} is currently unavailable for new assignments.` };
+    }
+    if (fac.currentLoad >= fac.maxLoad) {
+      return { ok: false, reason: `${fac.name} has reached the maximum supervision limit (${fac.maxLoad}).` };
+    }
+
     let oldSupervisorId = null;
 
     setStudents((prev) =>
@@ -173,6 +189,8 @@ export const DataProvider = ({ children }) => {
     setMilestoneAssignments((prev) =>
       prev[studentId]?.length ? prev : { ...prev, [studentId]: MILESTONE_PLAN }
     );
+
+    return { ok: true };
   };
 
   // Recompute progress from a known submissions array (avoids stale closure)
@@ -252,6 +270,38 @@ export const DataProvider = ({ children }) => {
     });
   };
 
+  const updateSupervisorSettings = (facultyId, { maxLoad, isAvailable }) => {
+      setFaculty((prev) =>
+        prev.map((f) =>
+          f.id === facultyId
+            ? {
+                ...f,
+                ...(maxLoad !== undefined && { maxLoad: Number(maxLoad) }),
+                ...(isAvailable !== undefined && { isAvailable }),
+              }
+            : f
+        )
+      );
+    };
+
+  const finalizeEvaluation = (studentId, { finalScore, finalFeedback }) => {
+    setStudents((prev) =>
+      prev.map((s) =>
+        s.id === studentId
+          ? { ...s, finalScore: Number(finalScore), finalFeedback, status: "Graded" }
+          : s
+      )
+    );
+    setEvaluationDrafts((prev) => {
+      const { [studentId]: _removed, ...rest } = prev;
+      return rest;
+    });
+    addNotification(
+      studentId,
+      `Your project has been evaluated. Final score: ${finalScore}/100.`
+    );
+  };
+
   const saveEvaluationDraft = (studentId, grades) => {
     setEvaluationDrafts((prev) => ({ ...prev, [studentId]: grades }));
   };
@@ -266,6 +316,37 @@ export const DataProvider = ({ children }) => {
 
   const markAllNotificationsAsRead = (userId) => {
     setNotifications((prev) => prev.map((n) => (n.userId === userId ? { ...n, read: true } : n)));
+  };
+
+  // Test Case 25: edit an existing consultation record (persists to context)
+  const updateConsultation = (id, updates) => {
+    setConsultations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+    );
+  };
+
+  // Test Case 20: remove a submission so the "not found" path can be exercised
+  const removeSubmissionForTesting = (id) => {
+    setSubmissions((prev) => {
+      const target = prev.find((s) => s.id === id);
+      const next = prev.filter((s) => s.id !== id);
+      if (target) syncProgress(target.studentId, next);
+      return next;
+    });
+  };
+
+  // Test Case 22: supervisor comment that does NOT alter progress status
+  const addProgressComment = (studentId, comment) => {
+    const entry = {
+      id: Date.now() + Math.random(),
+      studentId,
+      comment,
+      author: "Dr. Alan Turing",
+      date: new Date().toLocaleDateString("en-CA"),
+    };
+    setProgressComments((prev) => [entry, ...prev]);
+    // Deliberately does not touch students[].progress or students[].stage
+    return entry;
   };
 
   return (
@@ -290,6 +371,12 @@ export const DataProvider = ({ children }) => {
         markNotificationAsRead,
         markAllNotificationsAsRead,
         saveEvaluationDraft,
+        finalizeEvaluation,
+        progressComments,
+        updateConsultation,
+        removeSubmissionForTesting,
+        addProgressComment,
+        updateSupervisorSettings,
       }}
     >
       {children}
