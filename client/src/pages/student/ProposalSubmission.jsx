@@ -14,6 +14,7 @@ import {
   Save,
   Pencil,
   Trash2,
+  AlertCircle,
 } from "lucide-react";
 import { useData } from "../../context/DataContext";
 
@@ -25,6 +26,19 @@ const MILESTONES = [
   "Final Report",
 ];
 
+const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx", "zip"];
+const ALLOWED_MIME_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/zip",
+  "application/x-zip-compressed",
+  "multipart/x-zip",
+];
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const ACCEPT_ATTR = ".pdf,.doc,.docx,.zip";
+const MIN_DESCRIPTION_LENGTH = 10;
+
 export default function ProposalSubmission() {
   const { submissions, addSubmission, updateSubmission, deleteSubmission } =
     useData();
@@ -33,18 +47,19 @@ export default function ProposalSubmission() {
   const [showForm, setShowForm] = useState(false);
   const [filterMilestone, setFilterMilestone] = useState("All");
 
-  // Form state
+  // Form state — milestone now starts EMPTY so "not selected" is a real state
   const [editingId, setEditingId] = useState(null);
-  const [selectedMilestone, setSelectedMilestone] = useState(
-    "System Design Specification (SDS)"
-  );
-  const [file, setFile] = useState(null); // real File object (new upload only)
-  const [fileName, setFileName] = useState(null); // display name, works for both new and existing
+  const [selectedMilestone, setSelectedMilestone] = useState("");
+  const [file, setFile] = useState(null);
+  const [fileName, setFileName] = useState(null);
   const [studentMessage, setStudentMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Filter submissions for the current mocked student (Oliver Smith)
+  // Validation state
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
   const mySubmissions = submissions
     .filter((sub) => sub.studentId === "25001001")
     .filter(
@@ -52,19 +67,120 @@ export default function ProposalSubmission() {
     )
     .sort((a, b) => b.id - a.id);
 
+  // ---------- Validation ----------
+
+  const validateFile = (candidate) => {
+    const ext = candidate.name.split(".").pop()?.toLowerCase() || "";
+
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      return `Invalid file type ".${ext}". Only PDF, DOC, DOCX and ZIP files are accepted.`;
+    }
+    if (candidate.type && !ALLOWED_MIME_TYPES.includes(candidate.type)) {
+      return "Invalid file type. Only PDF, DOC, DOCX and ZIP files are accepted.";
+    }
+    if (candidate.size > MAX_FILE_SIZE) {
+      return `File is too large (${(candidate.size / 1024 / 1024).toFixed(
+        1
+      )}MB). Maximum allowed size is 50MB.`;
+    }
+    if (candidate.size === 0) {
+      return "This file appears to be empty. Please select a valid document.";
+    }
+    return null;
+  };
+
+  // Draft mode is lenient: only the file is mandatory.
+  const validateForm = (isDraft = false) => {
+    const nextErrors = {};
+
+    if (!selectedMilestone) {
+      nextErrors.milestone = "Please select a milestone type.";
+    }
+
+    if (!fileName) {
+      nextErrors.file = "Please upload a document before submitting.";
+    } else if (errors.file) {
+      nextErrors.file = errors.file; // keep an existing file-type error
+    }
+
+    if (!isDraft) {
+      const trimmed = studentMessage.trim();
+      if (!trimmed) {
+        nextErrors.description = "Please provide a description of this submission.";
+      } else if (trimmed.length < MIN_DESCRIPTION_LENGTH) {
+        nextErrors.description = `Description must be at least ${MIN_DESCRIPTION_LENGTH} characters.`;
+      }
+    }
+
+    return nextErrors;
+  };
+
+  // ---------- Handlers ----------
+
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setFileName(e.target.files[0].name);
+    const picked = e.target.files && e.target.files[0];
+    if (!picked) return;
+
+    setTouched((t) => ({ ...t, file: true }));
+    const error = validateFile(picked);
+
+    if (error) {
+      setErrors((prev) => ({ ...prev, file: error }));
+      setFile(null);
+      if (!editingId) setFileName(null);
+      e.target.value = "";
+      return;
+    }
+
+    setErrors((prev) => {
+      const { file: _removed, ...rest } = prev;
+      return rest;
+    });
+    setFile(picked);
+    setFileName(picked.name);
+    e.target.value = "";
+  };
+
+  const handleMilestoneChange = (e) => {
+    const value = e.target.value;
+    setSelectedMilestone(value);
+    setTouched((t) => ({ ...t, milestone: true }));
+    setErrors((prev) => {
+      if (!value) return { ...prev, milestone: "Please select a milestone type." };
+      const { milestone: _removed, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setStudentMessage(value);
+    if (touched.description) {
+      setErrors((prev) => {
+        const trimmed = value.trim();
+        if (!trimmed) {
+          return { ...prev, description: "Please provide a description of this submission." };
+        }
+        if (trimmed.length < MIN_DESCRIPTION_LENGTH) {
+          return {
+            ...prev,
+            description: `Description must be at least ${MIN_DESCRIPTION_LENGTH} characters.`,
+          };
+        }
+        const { description: _removed, ...rest } = prev;
+        return rest;
+      });
     }
   };
 
   const clearForm = () => {
     setEditingId(null);
-    setSelectedMilestone("System Design Specification (SDS)");
+    setSelectedMilestone("");
     setFile(null);
     setFileName(null);
     setStudentMessage("");
+    setErrors({});
+    setTouched({});
   };
 
   const openNewForm = () => {
@@ -75,9 +191,11 @@ export default function ProposalSubmission() {
   const openEditForm = (sub) => {
     setEditingId(sub.id);
     setSelectedMilestone(sub.milestone);
-    setFile(null); // no new file chosen yet
-    setFileName(sub.file); // keep the existing file name
+    setFile(null);
+    setFileName(sub.file);
     setStudentMessage(sub.studentMessage || "");
+    setErrors({});
+    setTouched({});
     setShowForm(true);
   };
 
@@ -87,7 +205,19 @@ export default function ProposalSubmission() {
   };
 
   const processSubmission = (status) => {
-    if (!fileName) return;
+    const isDraft = status === "Draft";
+    const validationErrors = validateForm(isDraft);
+
+    // Mark every field as touched so all messages surface at once
+    setTouched({ milestone: true, file: true, description: true });
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      // Nothing is written to storage — submission is rejected here.
+      return;
+    }
+
+    setErrors({});
     setIsSubmitting(true);
 
     setTimeout(() => {
@@ -95,20 +225,19 @@ export default function ProposalSubmission() {
         milestone: selectedMilestone,
         file: fileName,
         date: new Date().toISOString().split("T")[0],
-        studentMessage: studentMessage,
-        status: status, // "Draft" or "Pending Review"
+        studentMessage: studentMessage.trim(),
+        status: status,
       };
 
       if (editingId) {
         updateSubmission(editingId, {
           ...payload,
-          // Similarity is only generated at the moment of final submission
           ...(status === "Pending Review" && {
             similarityScore: Math.floor(Math.random() * 15) + 5,
           }),
         });
         setSuccessMessage(
-          status === "Draft"
+          isDraft
             ? "Your draft has been updated."
             : "Your draft has been submitted for review."
         );
@@ -117,11 +246,10 @@ export default function ProposalSubmission() {
           studentId: "25001001",
           studentName: "Oliver Smith",
           ...payload,
-          similarityScore:
-            status === "Draft" ? null : Math.floor(Math.random() * 15) + 5,
+          similarityScore: isDraft ? null : Math.floor(Math.random() * 15) + 5,
         });
         setSuccessMessage(
-          status === "Draft"
+          isDraft
             ? "Your draft has been saved. You can edit it any time."
             : "Your file has been successfully saved to your records."
         );
@@ -148,6 +276,11 @@ export default function ProposalSubmission() {
       deleteSubmission(id);
     }
   };
+
+  const errorCount = Object.keys(errors).length;
+  const showError = (field) => touched[field] && errors[field];
+
+  // ---------- Render ----------
 
   if (successMessage) {
     return (
@@ -337,8 +470,8 @@ export default function ProposalSubmission() {
       {/* Submission Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center sticky top-0 z-10">
               <h2 className="text-xl font-bold text-slate-800">
                 {editingId ? "Edit Draft" : "New Submission"}
               </h2>
@@ -350,44 +483,94 @@ export default function ProposalSubmission() {
               </button>
             </div>
 
-            <form className="p-6 space-y-6">
+            <form className="p-6 space-y-6" noValidate>
+              {/* Summary banner — makes "validation fails" unambiguous in a screenshot */}
+              {errorCount > 0 && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-3 p-4 bg-rose-50 border border-rose-200 rounded-xl"
+                >
+                  <AlertCircle className="w-5 h-5 text-rose-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm font-bold text-rose-700">
+                      Submission rejected — {errorCount} required field
+                      {errorCount > 1 ? "s are" : " is"} incomplete.
+                    </p>
+                    <p className="text-xs text-rose-600 mt-0.5">
+                      Please complete the highlighted fields below and try again.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Milestone */}
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Select Milestone
+                  Select Milestone <span className="text-rose-500">*</span>
                 </label>
                 <select
-                  required
                   value={selectedMilestone}
-                  onChange={(e) => setSelectedMilestone(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none text-sm font-semibold text-slate-700"
+                  onChange={handleMilestoneChange}
+                  onBlur={() => setTouched((t) => ({ ...t, milestone: true }))}
+                  aria-invalid={!!showError("milestone")}
+                  className={`w-full px-4 py-3 rounded-xl outline-none text-sm font-semibold transition-colors ${
+                    showError("milestone")
+                      ? "bg-rose-50 border-2 border-rose-400 text-slate-700 focus:ring-2 focus:ring-rose-500"
+                      : "bg-slate-50 border border-slate-200 text-slate-700 focus:ring-2 focus:ring-indigo-600"
+                  }`}
                 >
+                  <option value="" disabled={false}>
+                    -- Select a milestone --
+                  </option>
                   {MILESTONES.map((m) => (
                     <option key={m} value={m}>
                       {m}
                     </option>
                   ))}
                 </select>
+                {showError("milestone") && (
+                  <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-rose-600">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {errors.milestone}
+                  </p>
+                )}
               </div>
 
+              {/* File */}
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Upload Document
+                  Upload Document <span className="text-rose-500">*</span>
                 </label>
                 {!fileName ? (
-                  <div className="mt-1 flex justify-center px-6 pt-10 pb-12 border-2 border-slate-300 border-dashed rounded-xl hover:border-indigo-500 transition-colors cursor-pointer relative bg-slate-50/50">
+                  <div
+                    className={`mt-1 flex justify-center px-6 pt-10 pb-12 border-2 border-dashed rounded-xl transition-colors cursor-pointer relative ${
+                      showError("file")
+                        ? "border-rose-400 bg-rose-50/50 hover:border-rose-500"
+                        : "border-slate-300 bg-slate-50/50 hover:border-indigo-500"
+                    }`}
+                  >
                     <input
                       id="file-upload"
                       type="file"
+                      accept={ACCEPT_ATTR}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       onChange={handleFileChange}
                     />
                     <div className="space-y-2 text-center">
-                      <UploadCloud className="mx-auto h-12 w-12 text-slate-400" />
-                      <p className="font-bold text-indigo-600">
+                      <UploadCloud
+                        className={`mx-auto h-12 w-12 ${
+                          showError("file") ? "text-rose-400" : "text-slate-400"
+                        }`}
+                      />
+                      <p
+                        className={`font-bold ${
+                          showError("file") ? "text-rose-600" : "text-indigo-600"
+                        }`}
+                      >
                         Click or drag file to upload
                       </p>
                       <p className="text-xs text-slate-500">
-                        PDF, DOCX, ZIP up to 50MB
+                        PDF, DOC, DOCX, ZIP up to 50MB
                       </p>
                     </div>
                   </div>
@@ -411,6 +594,11 @@ export default function ProposalSubmission() {
                       onClick={() => {
                         setFile(null);
                         setFileName(null);
+                        setErrors((prev) => ({
+                          ...prev,
+                          file: "Please upload a document before submitting.",
+                        }));
+                        setTouched((t) => ({ ...t, file: true }));
                       }}
                       className="text-slate-500 hover:text-rose-600"
                     >
@@ -418,26 +606,55 @@ export default function ProposalSubmission() {
                     </button>
                   </div>
                 )}
+                {showError("file") && (
+                  <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-rose-600">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {errors.file}
+                  </p>
+                )}
               </div>
 
+              {/* Description */}
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Message to Supervisor (Optional)
+                  Description <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows="3"
                   value={studentMessage}
-                  onChange={(e) => setStudentMessage(e.target.value)}
+                  onChange={handleDescriptionChange}
+                  onBlur={() => setTouched((t) => ({ ...t, description: true }))}
+                  aria-invalid={!!showError("description")}
                   placeholder="e.g., Hi Dr., I have updated chapter 3 methodology..."
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none resize-none text-sm"
-                ></textarea>
+                  className={`w-full px-4 py-3 rounded-xl outline-none resize-none text-sm transition-colors ${
+                    showError("description")
+                      ? "bg-rose-50 border-2 border-rose-400 focus:ring-2 focus:ring-rose-500"
+                      : "bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-600"
+                  }`}
+                />
+                <div className="mt-2 flex items-start justify-between gap-3">
+                  {showError("description") ? (
+                    <p className="flex items-center gap-1.5 text-xs font-semibold text-rose-600">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      {errors.description}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-slate-400">
+                      Required for final submission. Minimum{" "}
+                      {MIN_DESCRIPTION_LENGTH} characters.
+                    </p>
+                  )}
+                  <span className="text-xs text-slate-400 shrink-0">
+                    {studentMessage.trim().length}/{MIN_DESCRIPTION_LENGTH}
+                  </span>
+                </div>
               </div>
 
               <div className="flex pt-4 space-x-4 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={handleSaveDraft}
-                  disabled={!fileName || isSubmitting}
+                  disabled={isSubmitting}
                   className="w-1/2 flex justify-center items-center px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 hover:border-slate-300 disabled:opacity-50 transition-all shadow-sm"
                 >
                   <Save className="w-4 h-4 mr-2" />
@@ -446,7 +663,7 @@ export default function ProposalSubmission() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={!fileName || isSubmitting}
+                  disabled={isSubmitting}
                   className="w-1/2 flex justify-center items-center px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-md"
                 >
                   {isSubmitting ? (
